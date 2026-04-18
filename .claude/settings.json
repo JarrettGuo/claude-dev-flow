@@ -1,0 +1,15 @@
+{
+  "$comment": "项目级 Claude Code 设置。可选。本文件目前只有示例 hooks（注释状态），按需启用。",
+  "$hooks_example": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '💡 改动完成后，运行 /commit 生成规范的 commit message'"
+          }
+        ]
+      }
+    ]
+  }
+}

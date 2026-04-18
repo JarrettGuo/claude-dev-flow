@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+    "claude-dev-flow": {
+      "command": "node",
+      "args": ["./server/index.js"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  },
+  "agents": {
+    "strategist": {
+      "role": "任务分析与路径规划",
+      "priority": 1
+    },
+    "reader": {
+      "role": "代码与文档读取",
+      "priority": 2
+    },
+    "designer": {
+      "role": "架构设计与方案输出",
+      "priority": 3
+    },
+    "builder": {
+      "role": "代码实现与文件操作",
+      "priority": 4
+    },
+    "verifier": {
+      "role": "验证与质量检查",
+      "priority": 5
+    },
+    "learner": {
+      "role": "经验总结与规则更新",
+      "priority": 6
+    }
+  },
+  "taskTypes": {
+    "code-dev": {
+      "description": "代码开发任务",
+      "requiredAgents": ["strategist", "reader", "designer", "builder", "verifier", "learner"]
+    },
+    "debug": {
+      "description": "问题排查与修复",
+      "requiredAgents": ["strategist", "reader", "verifier", "builder", "learner"]
+    },
+    "refactor": {
+      "description": "代码重构",
+      "requiredAgents": ["strategist", "reader", "designer", "builder", "verifier", "learner"]
+    }
+  }
+}
