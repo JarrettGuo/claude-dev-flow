@@ -38,6 +38,7 @@ claude-dev-flow/
 | `/fix` | Bug 修复流程（含强制验证） | bug 描述 / 错误信息 / 工单链接 | `.dev-flow/fixes/<bug>/` |
 | `/review` | 独立对抗性审查 | （可选）文件路径 | 终端输出 |
 | `/commit` | 按规范生成 commit message | （可选）改动提示 | 终端输出 |
+| `/flow-debug` | 复盘已完成的 /dev 或 /fix 流程，可选自动修复 | `<feature-name>` | `.dev-flow/.../DEBUG-REPORT.md` |
 
 ### 框架管理命令
 
@@ -222,6 +223,42 @@ Claude 会展示删除/停用计划、列出降级影响，让你确认后再动
 
 ---
 
+### `/flow-debug` — 复盘流程 + 一键修复
+
+每次 `/dev` 和 `/fix` 都会在 `.dev-flow/specs/<name>/FLOW.log` 或 `.dev-flow/fixes/<name>/FLOW.log` 生成完整执行日志。出问题时用这个命令复盘。
+
+**默认：分析 + 提修复方案 + 你确认后改代码**
+
+```
+/flow-debug avatar-upload
+```
+
+Claude 会：读 FLOW.log 和所有产物 → 找出问题 → 分类（🔴 可自动修 / 🟡 需人工判断 / 🔵 环境问题）→ 提修复方案给你确认 → 确认后改代码 + 跑测试
+
+**只分析不修**（方便粘给 GPT 二次诊断）
+
+```
+/flow-debug avatar-upload 只分析不要修
+```
+
+产出 `.dev-flow/specs/avatar-upload/DEBUG-REPORT.md`，末尾带可直接粘给 ChatGPT 的完整 prompt。
+
+**带具体指令**
+
+```
+/flow-debug password-reset 帮我修掉 review 提的 i18n 问题
+```
+
+Claude 聚焦处理你指定的问题。
+
+**修复规则**：
+- 只改 🔴 类问题（流程/环境问题永远不自动改）
+- 最多 2 轮尝试（比 /dev 的 3 轮更保守）
+- 失败自动 git checkout 回滚
+- 永不自动 commit
+
+---
+
 ## 典型工作流
 
 **新人第一天**：
@@ -245,6 +282,11 @@ Claude 会展示删除/停用计划、列出降级影响，让你确认后再动
 **接入新工具**：
 ```
 /add-skill <意图> # Claude 帮你搞定配置
+```
+
+**出问题复盘**：
+```
+/flow-debug <名字> # 读日志 + 分析 + 可选修复
 ```
 
 ---
