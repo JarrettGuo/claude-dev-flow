@@ -1,12 +1,32 @@
 {
-  "$comment": "项目级 Claude Code 设置。可选。本文件目前只有示例 hooks（注释状态），按需启用。",
-  "$hooks_example": {
-    "Stop": [
+  "$comment": "项目级 Claude Code 设置。hooks 用来为 flow-log 能力提供自动记录。脚本位于 .claude/hooks/flow-log.sh。",
+  "hooks": {
+    "SubagentStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "echo '💡 改动完成后，运行 /commit 生成规范的 commit message'"
+            "command": "bash .claude/hooks/flow-log.sh subagent-start \"$SUBAGENT_NAME\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/flow-log.sh subagent-stop \"$SUBAGENT_NAME\" \"$SUBAGENT_DURATION\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/flow-log.sh user-input \"$USER_PROMPT\""
           }
         ]
       }

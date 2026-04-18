@@ -74,6 +74,35 @@ Your work is stack-agnostic — you always read `CLAUDE.md` first to learn which
 
 如果项目明确不需要 i18n(CLAUDE.md 声明),跳过此规范。
 
+## 日志记录
+
+在关键节点用 Bash 工具写一行日志到当前 flow 的 FLOW.log：
+
+```bash
+FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
+if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
+  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+  TS=$(date +"%H:%M:%S")
+  # 按需选择下面之一：
+  printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" | tee -a "$LOG" >&2
+  # 或
+  printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" | tee -a "$LOG" >&2
+  # 或
+  printf "[%s] ⚠ WARN <警告内容>\n" "$TS" | tee -a "$LOG" >&2
+fi
+```
+
+**何时记**：
+- 调用关键 skill 时（如 read-requirement / search-codebase）
+- 产生重要产物时（如 requirements.md / design.md 写盘后）
+- 遇到降级（MCP 缺失等）时
+- 遇到异常但继续的情况
+
+**何时不记**：
+- 每个 Read / Grep / Edit 调用（太碎）
+- agent 进出（hook 自动记）
+- 不影响流程的微小动作
+
 ## Workflow
 
 1. **Read** `.dev-flow/specs/<feature-name>/design.md` — this is your contract.

@@ -17,14 +17,67 @@ User's bug report: $ARGUMENTS
 ## Workflow
 
 ### Phase 1: Analyze the bug report
-Invoke `@bug-analyst` with the user's input. The agent will use `read-requirement` + `fetch-error-context` skills to gather full context.
+
+**初始化 flow 日志**（在调用任何 agent 之前）：
+1. 生成 bug 名：根据用户输入的主题，用 kebab-case 提取 2-4 个词（如"登录后头像不显示" → `login-avatar-missing`）
+2. 创建目录：`mkdir -p .dev-flow/fixes/<bug-name>/`
+3. 创建日志文件并写入 header，使用 Bash 工具执行：
+
+```bash
+FEATURE="fixes/<bug-name>"
+mkdir -p ".dev-flow/${FEATURE}"
+echo "$FEATURE" > ".dev-flow/.current-flow"
+
+LOG=".dev-flow/${FEATURE}/FLOW.log"
+cat > "$LOG" <<'EOF'
+═══════════════════════════════════════════════════════════
+ FLOW LOG: <bug-name>
+ Command: /fix <用户输入>
+ Started: TIMESTAMP_PLACEHOLDER
+ Project: PWD_PLACEHOLDER
+═══════════════════════════════════════════════════════════
+
+EOF
+
+# 替换占位符
+sed -i "s|TIMESTAMP_PLACEHOLDER|$(date +'%Y-%m-%d %H:%M:%S')|" "$LOG"
+sed -i "s|PWD_PLACEHOLDER|$(pwd)|" "$LOG"
+
+# 写启动事件（文件+终端）
+TS=$(date +"%H:%M:%S")
+printf "[%s] ▶ START /fix 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ∙ INPUT %s\n" "$TS" "<用户输入的简短摘要，≤60字符>" | tee -a "$LOG" >&2
+printf "\n─── Phase 1: Analyze ──────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 1 启动\n" "$TS" | tee -a "$LOG" >&2
+```
+
+然后 invoke `@bug-analyst` with the user's input. The agent will use `read-requirement` + `fetch-error-context` skills to gather full context.
 
 After it completes:
-- Show the bug report summary
+
+1. 写"等待确认"日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ⏸ GATE 等待用户确认问题描述\n" "$TS" | tee -a "$LOG" >&2
+```
+
+2. Show the bug report summary
 - If there are `待确认` items, ask user to clarify (max 3 questions)
 - If too vague, **pause** and suggest user gather more info (steps / error messages / screenshots)
 
-Ask: "问题描述清楚了？(y / n / 编辑)"
+3. Ask: "问题描述清楚了？(y / n / 编辑)"
+
+4. 用户确认后，在进入 Phase 2 前写日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ DECISION 用户确认问题描述 → 进入 Phase 2\n" "$TS" | tee -a "$LOG" >&2
+printf "\n─── Phase 2: Diagnose ─────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 2 启动\n" "$TS" | tee -a "$LOG" >&2
+```
 
 ### Phase 2: Diagnose (root cause analysis)
 Invoke `@debugger` with the bug report.
@@ -41,6 +94,14 @@ Show:
 - 涉及的文件和行号
 - 建议的修复方向
 
+写"等待确认"日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ⏸ GATE 等待用户确认根因分析\n" "$TS" | tee -a "$LOG" >&2
+```
+
 Ask: "根因分析正确？可以进入修复？(y / n / 需要更多排查)"
 
 **If "需要更多排查"**: re-invoke `@debugger` with user's additional context.
@@ -50,6 +111,16 @@ Ask: "根因分析正确？可以进入修复？(y / n / 需要更多排查)"
 > 1. 加临时日志到生产环境收集更多信息
 > 2. 寻找同事协助排查
 > 3. 考虑是否是环境/配置问题而非代码 bug"
+
+用户确认后，在进入 Phase 3 前写日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ DECISION 用户确认根因 → 进入 Phase 3\n" "$TS" | tee -a "$LOG" >&2
+printf "\n─── Phase 3: Plan ────────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 3 启动\n" "$TS" | tee -a "$LOG" >&2
+```
 
 ### Phase 3: Plan the fix (lightweight)
 
@@ -89,6 +160,16 @@ Ask: "修复方案确认？(y / n / 编辑)"
 
 **If fix touches > 20 lines or affects interface contracts**: 警告并建议考虑 `/dev` 流程（大 bug 本质是设计问题）。
 
+用户确认后，在进入 Phase 4 前写日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ DECISION 用户确认修复方案 → 进入 Phase 4\n" "$TS" | tee -a "$LOG" >&2
+printf "\n─── Phase 4: Implement ─────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 4 启动\n" "$TS" | tee -a "$LOG" >&2
+```
+
 ### Phase 4: Implement the fix
 
 **先确认项目类型**（从 CLAUDE.md 读取）。
@@ -113,6 +194,16 @@ Ask: "修复方案确认？(y / n / 编辑)"
 
 If implementer hits blocker, invoke `@debugger` again — 可能初始诊断不完整。
 
+实现完成后，在进入 Phase 5 前写日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ DECISION 修复实现完成 → 进入 Phase 5\n" "$TS" | tee -a "$LOG" >&2
+printf "\n─── Phase 5: Verify ──────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS" | tee -a "$LOG" >&2
+```
+
 ### Phase 5: Verify
 
 Run verification via Bash:
@@ -122,7 +213,25 @@ Run verification via Bash:
 3. **跑完整测试套件** —— 确认无回归
 4. **跑 lint + typecheck** —— 确认规范
 
-Show results. Any失败则回到 Phase 4。
+Show results. Any失败则：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ↻ RETRY Verify 失败，回到 Phase 4\n" "$TS" | tee -a "$LOG" >&2
+```
+
+回到 Phase 4。
+
+验证通过后，在进入 Phase 6 前写日志：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ DECISION 验证通过 → 进入 Phase 6\n" "$TS" | tee -a "$LOG" >&2
+printf "\n─── Phase 6: Review ──────────────────────────────────────\n" | tee -a "$LOG" >&2
+printf "[%s] ▶ PHASE Phase 6 启动\n" "$TS" | tee -a "$LOG" >&2
+```
 
 ### Phase 6: Review
 
@@ -134,9 +243,32 @@ Invoke `@reviewer` with focus hint:
 > 4. 有没有引入新的异常路径或边界情况？
 
 Handle:
-- **APPROVED**: 进入 Phase 7
-- **CHANGES_REQUESTED**: re-invoke implementer + re-review。最多 3 轮。
-- **BLOCKED**: invoke `@debugger` —— 根因很可能判断错了。
+- **APPROVED**: 
+  ```bash
+  LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+  TS=$(date +"%H:%M:%S")
+  printf "[%s] ✓ COMPLETE Review APPROVED\n" "$TS" | tee -a "$LOG" >&2
+  printf "\n─── Phase 7: Commit & Summary ────────────────────────────\n" | tee -a "$LOG" >&2
+  printf "[%s] ▶ PHASE Phase 7 启动\n" "$TS" | tee -a "$LOG" >&2
+  ```
+  进入 Phase 7
+  
+- **CHANGES_REQUESTED**: 
+  ```bash
+  LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+  TS=$(date +"%H:%M:%S")
+  ROUND="<当前轮次>"  # 1/2/3
+  printf "[%s] ↻ RETRY Review CHANGES_REQUESTED (round %s/3)\n" "$TS" "$ROUND" | tee -a "$LOG" >&2
+  ```
+  re-invoke implementer + re-review。最多 3 轮。
+  
+- **BLOCKED**: 
+  ```bash
+  LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+  TS=$(date +"%H:%M:%S")
+  printf "[%s] ✗ ERROR Review BLOCKED，invoke debugger\n" "$TS" | tee -a "$LOG" >&2
+  ```
+  invoke `@debugger` —— 根因很可能判断错了。
 
 ### Phase 7: Commit & Summary
 
@@ -177,6 +309,26 @@ Write final report to `.dev-flow/fixes/<bug-name>/summary.md`:
 
 ## 建议分支
 按 CLAUDE.md 的 Git 分支命名规范（通常是 `hotfix/<bug-name>` 或类似）
+```
+
+最后写入 footer 并清理当前流程标记：
+
+```bash
+LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
+TS=$(date +"%H:%M:%S")
+printf "[%s] ✓ COMPLETE /fix 流程完成\n" "$TS" | tee -a "$LOG" >&2
+
+# footer
+cat >> "$LOG" <<EOF
+
+═══════════════════════════════════════════════════════════
+ COMPLETED: $(date +'%Y-%m-%d %H:%M:%S')
+ See .dev-flow/$(cat .dev-flow/.current-flow)/ for all deliverables
+═══════════════════════════════════════════════════════════
+EOF
+
+# 清理当前流程标记
+rm -f .dev-flow/.current-flow
 ```
 
 ## Rules
