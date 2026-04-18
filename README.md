@@ -28,7 +28,7 @@ claude-dev-flow/
 
 ## 命令速查
 
-框架提供 7 个 slash 命令，分为**开发流程**和**框架管理**两类。
+框架提供 9 个 slash 命令，分为**开发流程**和**框架管理**两类。
 
 ### 开发流程命令
 
@@ -47,6 +47,7 @@ claude-dev-flow/
 | `/init-claude-md` | 扫描项目自动生成 `CLAUDE.md` 项目上下文 |
 | `/add-skill` | 用自然语言添加/启用能力（MCP 或 skill） |
 | `/remove-skill` | 用自然语言停用/删除能力 |
+| `/upgrade` | 从 GitHub 拉取最新框架，安全升级本项目 `.claude/`（保护本地改动） |
 
 ---
 
@@ -259,6 +260,50 @@ Claude 聚焦处理你指定的问题。
 
 ---
 
+### `/upgrade` — 升级框架到最新版
+
+从 GitHub 拉取 `claude-dev-flow` 最新版，智能升级本项目的 `.claude/` 目录。**保护你的本地文件和对框架文件的修改**。
+
+**默认：拉最新 + 展示预览 + 你确认 + 升级**
+
+```
+/upgrade
+```
+
+Claude 会：clone 远端 → 对比本地 `.claude/.version` → 把框架文件分成三类（🆕 新增 / ✅ 安全覆盖 / ⚠️ 你改过）→ 列出预览 → 你改过的文件**逐个问你**（覆盖 / 跳过 / 看 diff）→ 确认后升级 + 备份你的版本到 `.claude.backup-<时间戳>/`。
+
+**只预览不执行**（先看看要改什么）
+
+```
+/upgrade --dry-run
+```
+
+打印完整升级计划、不动任何文件。适合在正式升级前评估影响范围。
+
+**连 README 也一起同步**（默认不动 README，因为你可能改成项目自己的）
+
+```
+/upgrade --with-readme
+```
+
+**指定其他来源**（比如你 fork 了框架）
+
+```
+/upgrade --source https://github.com/YourOrg/claude-dev-flow
+```
+
+**受保护文件**（永远不动）：
+- `CLAUDE.md` / `CLAUDE.md.bak`（你的项目上下文）
+- `.mcp.json`（你启用的 MCP）
+- `.dev-flow/`（历史运行记录）
+- `.env` / `.env.*`
+- `.claude/agent-memory-local/`（agent 跨会话记忆）
+- 你自己新增的 agent / command / skill（框架仓库里没有的）
+
+**冲突策略**：框架文件你改过就**停下来问你**，绝不静默覆盖。选择覆盖时会先备份整个 `.claude/` 到 `.claude.backup-YYYYMMDD-HHMMSS/`，想找回改动随时能翻。
+
+---
+
 ## 典型工作流
 
 **新人第一天**：
@@ -287,6 +332,12 @@ Claude 聚焦处理你指定的问题。
 **出问题复盘**：
 ```
 /flow-debug <名字> # 读日志 + 分析 + 可选修复
+```
+
+**升级框架**：
+```
+/upgrade # 拉最新 + 交互式升级
+/upgrade --dry-run # 只看不改
 ```
 
 ---
