@@ -1,5 +1,5 @@
 ---
-description: Run the full bug fix flow for Vue3 + egg.js projects. Orchestrates bug-analyst → debugger → implementer → reviewer with focus on minimal, safe, regression-proof fixes.
+description: Run the full bug fix flow. Orchestrates bug-analyst → debugger → implementer → reviewer with focus on minimal, safe, regression-proof fixes. Project stack and standards are read from CLAUDE.md.
 argument-hint: <bug description, error message, or bug report URL>
 ---
 
@@ -66,7 +66,8 @@ Unlike `/dev`, we do NOT invoke `@architect` for a full design doc. Instead, pro
 - `path/to/other.ts:88` — <改什么，为什么>
 
 ### 改动范围
-- 前端 / Node 层 / 两边
+- 涉及端：前端 / 后端 / 两者（按 CLAUDE.md 的项目类型）
+- 具体位置：按 CLAUDE.md 声明的目录结构
 - 预计改动行数：约 X 行
 
 ### 回归测试
@@ -74,7 +75,7 @@ Unlike `/dev`, we do NOT invoke `@architect` for a full design doc. Instead, pro
 
 ### 副作用评估
 - 可能受影响的其他功能：<列出或"无">
-- 是否需要 proto 变更：<是/否>
+- 是否需要接口定义变更（proto / OpenAPI / schema，如 CLAUDE.md 要求）：<是/否>
 - 是否影响接口契约：<是/否>
 
 ### 风险等级
@@ -90,18 +91,25 @@ Ask: "修复方案确认？(y / n / 编辑)"
 
 ### Phase 4: Implement the fix
 
-Based on fix scope:
-- **仅前端**: invoke `@implementer-fe`
-- **仅 Node 层**: invoke `@implementer-be`
-- **两边都改**: 先 be 再 fe
+**先确认项目类型**（从 CLAUDE.md 读取）。
+
+**按项目类型 + fix 涉及范围调度**：
+
+| 项目类型 | fix 涉及 | 调度方式 |
+|---------|---------|---------||
+| full-stack | 仅前端 | invoke `@implementer-fe` |
+| full-stack | 仅后端 | invoke `@implementer-be` |
+| full-stack | 两者 | 先 `@implementer-be`（如果涉及接口），再 `@implementer-fe` |
+| frontend-only | —— | invoke `@implementer-fe` |
+| backend-only | —— | invoke `@implementer-be` |
 
 **Critical instruction to pass to implementers**:
 > 这是 bug 修复，不是新功能。约束：
 > 1. **最小改动** —— 只改必要的行，不要顺手重构
-> 2. **必须加回归测试** —— 至少一个能复现原 bug 的测试
-> 3. **跑完整测试套件** —— 不能只跑新测试
+> 2. **必须加回归测试** —— 至少一个能复现原 bug 的测试；测试框架按 CLAUDE.md 声明
+> 3. **跑完整测试套件** —— 不能只跑新测试；命令按 CLAUDE.md 声明
 > 4. **不要改公共接口** —— 除非根因就在接口上
-> 5. 按团队规范：异常处理、日志上报、监控上报一样不能漏
+> 5. **按 CLAUDE.md 的团队规范**：异常处理、日志上报、监控上报一样不能漏
 
 If implementer hits blocker, invoke `@debugger` again — 可能初始诊断不完整。
 
@@ -165,10 +173,10 @@ Write final report to `.dev-flow/fixes/<bug-name>/summary.md`:
 <根据根因，未来如何避免这类 bug>
 
 ## Commit 建议
-<来自 format-commit skill 的输出>
+<来自 format-commit skill 的输出。type 通常是 `fix`，scope 按 CLAUDE.md 的 Git 规范声明的值选择>
 
 ## 建议分支
-`hotfix/<bug-name>`
+按 CLAUDE.md 的 Git 分支命名规范（通常是 `hotfix/<bug-name>` 或类似）
 ```
 
 ## Rules

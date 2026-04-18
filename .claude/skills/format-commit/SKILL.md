@@ -43,10 +43,14 @@ description: Generate a standards-compliant git commit message following the tea
 - `revert` — 回滚
 
 ### scope（可选）
-影响范围。常见值：
+影响范围。scope 的具体值**必须从 CLAUDE.md 的 Git 规范段落读取**。
 
-前端：`view` / `component` / `composable` / `service` / `store` / `router` / `util` / `const`，或模块名
-Node 层：`controller` / `service` / `model` / `middleware` / `router` / `proto` / `config` / `extend` / `util` / `const`
+如果 CLAUDE.md 没有明确声明 scope 候选清单，按以下通用启发式推断：
+- **按分层**：根据 CLAUDE.md 声明的项目分层选值（如控制层、服务层、数据层、组件层等）
+- **按模块**：以项目的业务模块名作为 scope（如 `profile` / `auth` / `dashboard`）
+- **按目录**：以改动集中的目录名作为 scope
+
+如果 CLAUDE.md 未声明且改动跨越多个分层/模块，**省略 scope**。
 
 ### subject（必须）
 - ≤ 50 字符（**严格**）
@@ -55,12 +59,17 @@ Node 层：`controller` / `service` / `model` / `middleware` / `router` / `proto
 - 动词开头
 
 ### 示例
+
+以下示例基于典型的分层命名（前端 + Node 后端场景）。**实际项目的 scope 值以 CLAUDE.md 为准**。
+
 ```
 fix(model): creatAt 字段缺失
 feat(controller): 用户查询接口开发
 refactor(composable): 抽离表单校验逻辑
 perf(view): 列表渲染添加虚拟滚动
 ```
+
+如果你的项目 scope 约定不同（比如 `fix(api)` / `feat(auth)` / `refactor(hooks)` 等），按 CLAUDE.md 的规范使用。
 
 ## 执行流程
 
@@ -72,9 +81,13 @@ perf(view): 列表渲染添加虚拟滚动
    - 是新功能？bug 修复？重构？格式化？依赖更新？
    - 是单一类型还是混杂？
 3. **推断 scope**：
-   - 改动集中在 `client/` 还是 `server/`？
-   - 集中在哪个分层？
-   - 是否涉及单一业务模块？
+   - **先读 CLAUDE.md 的"Git Commit 规范"段落**获取项目声明的 scope 候选清单
+   - 如有清单，从清单里选最贴合本次改动的那个
+   - 如 CLAUDE.md 未声明 scope 清单：
+     - 改动集中在哪个目录？（按 CLAUDE.md 的目录约定，如前端根目录 / 后端根目录）
+     - 改动集中在哪个分层？
+     - 改动涉及的是通用层还是单一业务模块？
+   - 若改动跨越多个分层/模块，省略 scope
 4. **检测红旗**（见下）
 5. **生成建议**：主推荐 + 1-2 个备选
 6. **若前后端都改**：额外建议拆分提交
