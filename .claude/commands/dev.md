@@ -1,5 +1,5 @@
 ---
-description: Run the full development flow for a Vue3 + egg.js feature. Orchestrates analyst → architect → implementer-fe/be → reviewer → debugger, ending with a standards-compliant commit suggestion.
+description: Run the full development flow for a feature. Orchestrates analyst → architect → implementer-fe/be → reviewer → debugger, ending with a standards-compliant commit suggestion. Project stack and standards are read from CLAUDE.md.
 argument-hint: <feature description or requirement doc URL>
 ---
 
@@ -20,21 +20,31 @@ After it completes, show the requirements doc summary and ask: "需求确认？(
 Once requirements approved, invoke `@architect`.
 
 After it completes, show design summary highlighting:
-- 前端改动范围
-- Node 层改动范围
-- 是否新增 proto
+- 涉及的端（前端 / 后端 / 两者；按 CLAUDE.md 的项目类型）
+- 具体改动范围（按 CLAUDE.md 声明的目录和分层）
+- 是否需要新接口定义（proto / OpenAPI / schema，如 CLAUDE.md 要求）
 - 风险点
 
 Ask: "方案确认？(y / n / 编辑)"
 
 ### Phase 3: Implement
-Based on the design scope, invoke implementers:
 
-- **只前端改动**：invoke `@implementer-fe`
-- **只 Node 层改动**：invoke `@implementer-be`
-- **两边都改**（常见情况）：
-  - 先 invoke `@implementer-be`（proto + API 就绪）
-  - 再 invoke `@implementer-fe`（前端消费已就绪的 API）
+**先确认项目类型**（从 CLAUDE.md 的"项目类型"字段读取）：
+- `full-stack`（前后端都有）
+- `frontend-only`（仅前端）
+- `backend-only`（仅后端）
+
+**根据项目类型 + 设计涉及范围调度 implementer**：
+
+| 项目类型 | 设计涉及范围 | 调度方式 |
+|---------|-------------|---------||
+| full-stack | 只前端改动 | invoke `@implementer-fe` |
+| full-stack | 只后端改动 | invoke `@implementer-be` |
+| full-stack | 前后端都改 | 先 `@implementer-be`（后端接口先就绪），再 `@implementer-fe`（前端消费已就绪的 API） |
+| frontend-only | —— | invoke `@implementer-fe` |
+| backend-only | —— | invoke `@implementer-be` |
+
+**为什么前后端都改时先后端**：后端接口定义好了，前端调用才有稳定契约。如果 CLAUDE.md 声明项目的接口契约优先级不同（比如先定 schema 再分头实现），按 CLAUDE.md 走。
 
 If any implementer reports a blocker, invoke `@debugger` with the blocker, then resume.
 
@@ -50,13 +60,18 @@ Handle the result:
 
 Use the `format-commit` skill to analyze the current changes and produce a commit message.
 
-**If both frontend and backend changed**: 默认建议拆分成两个 commit:
-```
-feat(controller): 用户头像上传接口
-feat(view): 用户头像上传交互
-```
+**拆分策略（按 CLAUDE.md 的 Git 规范 + 项目类型决定）**：
 
-如果改动很小且单一，才给单个 commit。
+- **full-stack 项目，前后端都改**：默认建议拆分成两个 commit，scope 分别对应前端和后端的分层（具体 scope 值参考 CLAUDE.md 的 Git Commit 规范段落）
+- **full-stack 项目，仅一端改**：单个 commit
+- **frontend-only 或 backend-only 项目**：单个 commit
+- **改动极小且单一**：单个 commit
+
+示例（具体 type / scope 按项目实际使用的约定）：
+```
+<type>(<backend-scope>): 后端改动描述
+<type>(<frontend-scope>): 前端改动描述
+```
 
 **绝不自动执行 `git commit`** — 只给用户命令和建议。
 

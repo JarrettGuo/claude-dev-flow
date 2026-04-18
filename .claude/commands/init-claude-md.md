@@ -1,215 +1,369 @@
 ---
-description: Auto-generate CLAUDE.md by scanning the Vue3 + egg.js project structure, detecting conventions, and asking minimal clarifying questions.
+description: Auto-generate CLAUDE.md by scanning the project structure, detecting tech stack and conventions, and asking minimal clarifying questions. Supports full-stack / frontend-only / backend-only projects with any framework.
 ---
 
-You are going to generate a comprehensive `CLAUDE.md` for this Vue3 + egg.js project.
+You are going to generate a comprehensive `CLAUDE.md` for this project.
+
+**重要原则**：
+- **不要假设技术栈**。扫描代码库得出实际栈，而不是套用任何默认栈
+- **不要假设目录结构**。前端目录叫什么、后端目录叫什么、是否 monorepo，都从扫描结果推断
+- **尽量减少打扰用户**。能从代码库推断的都自己推断，只问扫不出来的问题
 
 ## Workflow
 
-### Step 1: Scan the project
+### Step 1: 识别项目类型
 
-Use Glob + Read to detect:
+先判断是 `full-stack` / `frontend-only` / `backend-only` / `library` 的哪一种：
 
-**项目结构**
-- 确认是否 `client/` + `server/` 双目录结构
-- 前端目录结构（pages/components/composables/services/...）
-- Node 层目录结构（controller/service/model/proto/...）
+```bash
+ls -la
+```
 
-**前端配置** (`client/package.json`)
-- Vue 版本
-- TypeScript 版本
-- 构建工具（Vite / Webpack）
-- UI 库（element-plus / ant-design-vue / 自研）
-- 状态管理（Pinia / Vuex）
-- 路由（vue-router）
-- i18n 工具（vue-i18n）
-- 测试工具（vitest）
-- Lint 工具
+**判断启发式**：
 
-**Node 层配置** (`server/package.json`, `server/config/`)
-- egg.js 版本
-- TypeScript 配置
-- 使用的插件
-- srpc 客户端库
-- 日志库、监控库
+1. **扫顶层目录名**：
+   - 常见前端目录名：`client/` `frontend/` `web/` `app/` `ui/` `apps/web/`
+   - 常见后端目录名：`server/` `backend/` `api/` `service/` `node/` `apps/api/`
+   - 如果上述都没有，只有 `src/`：可能是单层应用（前端 SPA、或后端服务、或库）
 
-**srpc & proto**
-- 列出 `server/app/proto/` 下的 proto 文件
-- 识别主要的 srpc 服务
+2. **扫 `package.json`**（如果只有一个）：
+   - 有前端框架依赖 → frontend（或 full-stack 的前端部分）
+   - 有后端框架依赖 → backend
+   - 同时有 → full-stack（单 package.json 的混合项目）
 
-**命令**
-- 读 `package.json` 的 scripts，识别：启动、构建、测试、lint、typecheck 命令
+3. **扫多个 `package.json`**（monorepo）：
+   - 每个子目录分别判断
 
-**约定**
-- 扫描 5-10 个代表性文件，识别命名约定、错误处理模式、接口调用方式等
+**结果**：明确记录下来，用作后续生成 CLAUDE.md 的"项目类型"字段。
 
-### Step 2: Ask minimal clarifying questions
+### Step 2: 识别前端（如有）
 
-Only ask things that **cannot be inferred from scanning**:
-- 业务领域是什么？
-- 是否有特殊的代码评审重点？
-- 是否有敏感的"别碰"模块？
-- 是否有特殊的发布/部署流程约束？
+如果 Step 1 判断有前端部分，在前端根目录扫描：
 
-一次最多问 3 个问题。
+#### 框架识别
 
-### Step 3: Generate CLAUDE.md
+读 `package.json`，按以下优先级判断：
 
-Write to `CLAUDE.md` at project root using this template:
+| 依赖关键字 | 框架 |
+|-----------|------|
+| `vue` | Vue（进一步看版本号：`^2` / `^3`） |
+| `react` | React |
+| `@angular/core` | Angular |
+| `svelte` | Svelte |
+| `solid-js` | Solid |
+| `next` | Next.js（React 生态） |
+| `nuxt` | Nuxt（Vue 生态） |
+| `@remix-run/react` | Remix |
+
+**如果都没匹配到**：问用户"前端框架是什么？"
+
+#### 语言
+
+- 有 `typescript` 依赖或 `tsconfig.json` → TypeScript
+- 否则 → JavaScript
+
+#### 构建/开发工具
+
+查 `devDependencies` 和配置文件：
+
+| 线索 | 工具 |
+|------|------|
+| `vite` 依赖 或 `vite.config.*` | Vite |
+| `webpack` 依赖 或 `webpack.config.*` | Webpack |
+| `rollup` | Rollup |
+| `esbuild` | esbuild |
+| `parcel` | Parcel |
+| `turbopack` | Turbopack |
+
+#### UI 库
+
+查依赖：`element-plus` / `ant-design` / `antd` / `@mui/material` / `chakra-ui` / `naive-ui` / `vuetify` / `tailwindcss` 等。列出找到的主要 UI 相关库。
+
+#### 状态管理
+
+查依赖：`pinia` / `vuex` / `redux` / `@reduxjs/toolkit` / `zustand` / `mobx` / `jotai` / `recoil` 等。
+
+#### 路由
+
+`vue-router` / `react-router` / `react-router-dom` / `@angular/router` / 或框架内置（Next/Nuxt/Remix）。
+
+#### 国际化
+
+`vue-i18n` / `react-i18next` / `i18next` / `@formatjs/*` 等。如都没找到，记录"项目未显式使用 i18n"。
+
+#### 测试工具
+
+`vitest` / `jest` / `mocha` / `playwright` / `cypress` / `@testing-library/*` 等。
+
+#### Lint / 格式化
+
+`eslint` / `prettier` / `biome` / `stylelint` 及对应配置文件。
+
+### Step 3: 识别后端（如有）
+
+如果 Step 1 判断有后端部分，在后端根目录扫描：
+
+#### 框架识别
+
+读 `package.json`：
+
+| 依赖关键字 | 框架 |
+|-----------|------|
+| `egg` | egg.js |
+| `express` | Express |
+| `@nestjs/core` | NestJS |
+| `koa` | Koa |
+| `fastify` | Fastify |
+| `hapi` / `@hapi/hapi` | Hapi |
+| `hono` | Hono |
+
+**如果都没匹配到**：问用户"后端框架是什么？"
+
+#### 语言
+
+同前端逻辑。
+
+#### 接口/通信
+
+查：
+- `server/app/proto/`、`proto/`、`protos/` 等目录 → srpc / gRPC 风格
+- `.proto` 文件存在 → 同上
+- `openapi.yaml` / `swagger.json` / `openapi.json` → OpenAPI
+- `schema.graphql` / `@apollo/server` / `graphql` 依赖 → GraphQL
+- 都没找到 → 纯 RESTful HTTP
+
+#### 数据库/ORM
+
+查依赖：`mysql2` / `pg` / `mongodb` / `redis` / `sequelize` / `typeorm` / `prisma` / `mongoose` 等。
+
+#### 测试工具
+
+同前端逻辑。
+
+### Step 4: 识别包管理器
+
+**强锁文件优先**：
+- `pnpm-lock.yaml` → pnpm
+- `yarn.lock` → yarn
+- `package-lock.json` → npm
+- `bun.lockb` → bun
+
+**都存在**：问用户（很少见）。**都不存在**：默认 npm。
+
+### Step 5: 识别常用命令
+
+读 `package.json` 的 `scripts` 字段，识别并记录：
+
+- **启动/开发**：通常是 `dev` / `start` / `serve`
+- **构建**：通常是 `build`
+- **测试**：通常是 `test` / `test:unit`
+- **Lint**：通常是 `lint`
+- **Typecheck**：通常是 `typecheck` / `type-check` / `tsc --noEmit`
+
+**全栈项目**：前端和后端的命令分别记录。
+
+### Step 6: 扫几个代表性文件推断代码规范
+
+读取 5-10 个代表性源文件（优先业务核心文件，避免 `node_modules`、测试数据、自动生成的文件），观察：
+
+- **命名习惯**：驼峰/下划线/kebab-case 的使用
+- **接口调用模式**：是否统一走 services 层、响应体格式、错误处理方式
+- **组件/模块结构**：文件大小、职责划分
+- **i18n 使用**：是否所有 UI 文本走 i18n
+- **注释习惯**：是否有 JSDoc、是否有复杂逻辑注释
+
+**这些推断仅用于"提示用户确认"**，不要直接写死进 CLAUDE.md。把推断结果在 Step 7 打印给用户，让他们确认或修改。
+
+### Step 7: 问最少必要的问题
+
+**只问扫不出来的内容**。一次最多 3 个问题：
+
+1. **业务领域**是什么？一句话描述（用于让未来的 AI 理解上下文）
+2. 有哪些**不要碰的模块**？（比如正在重构、或其他团队维护）
+3. 是否有**特殊的发布/部署流程**约束？（比如特定环境要跑特定命令）
+
+**已经扫到的内容不要重复问**。例如：前端用 Vue 已从 `package.json` 看出来了，就不要再问"你们用什么前端框架？"。
+
+### Step 8: 生成 CLAUDE.md
+
+**如果 `CLAUDE.md` 已存在**：先 `cp CLAUDE.md CLAUDE.md.bak` 备份，告知用户。
+
+然后写入新的 `CLAUDE.md`，**按项目实际情况**填入以下模板。**未扫到且用户未提供的字段标记为 `<待补充>`，不要编造**。
 
 ```markdown
 # 项目上下文
 
 ## 业务领域
-<从用户回答获取>
+<Step 7 获取>
+
+## 项目类型
+- 类型：<full-stack / frontend-only / backend-only / library>
+- 前端根目录：<如 client/ / frontend/ / src/ / "N/A">
+- 后端根目录：<如 server/ / backend/ / api/ / "N/A">
+- 是否 monorepo：<是/否>
 
 ## 技术栈
 
-### 前端 (client/)
-- Vue <version> + TypeScript
-- 构建工具：<detected>
-- UI 库：<detected>
-- 状态管理：<detected>
-- 路由：<detected>
-- 国际化：<detected>
-- 测试：<detected>
+### 前端（如适用）
+- 框架：<Vue 3.x / React 18 / Angular 17 / ...>
+- 语言：<TypeScript / JavaScript>
+- 构建工具：<Vite / Webpack / ...>
+- UI 库：<element-plus / antd / tailwindcss / ...>
+- 状态管理：<Pinia / Redux / ...>
+- 路由：<vue-router / react-router / ...>
+- 国际化：<vue-i18n / i18next / 未使用>
+- 测试：<vitest / jest / ...>
+- Lint：<eslint / prettier>
 
-### Node 层 (server/)
-- egg.js <version> + TypeScript
-- srpc 客户端：<detected>
-- 日志：<detected>
-- 监控：<detected>
+### 后端（如适用）
+- 框架：<egg.js 3.x / Express / NestJS / ...>
+- 语言：<TypeScript / JavaScript>
+- 接口通信：<srpc / OpenAPI / GraphQL / RESTful>
+- 接口定义文件位置：<如 server/app/proto/ / openapi.yaml / "无">
+- 数据库/ORM：<mysql2 / prisma / typeorm / mongoose / ...>
+- 测试：<vitest / jest / ...>
+- Lint：<eslint>
 
-### 渲染方式
-前端页面通过 Node 层路由渲染（非独立 SPA）。
+### 渲染方式（仅 full-stack 项目）
+<如"前端页面通过 Node 层路由渲染（非独立 SPA）" / "独立 SPA，Node 层仅提供 API" / "SSR 模式" / 等>
+
+## 包管理
+- 工具：<pnpm / npm / yarn / bun>
+- 锁文件：<pnpm-lock.yaml / ...>
 
 ## 项目结构
 
-### client/
-<扫描到的目录树，带简要说明>
+### 前端目录（如适用）
+<扫描到的实际目录树，带简要说明。典型可能包括：
+- views/ — 页面
+- components/ — 组件
+- composables/ 或 hooks/ — 组合式函数 / hooks
+- services/ 或 api/ — 接口调用
+- store/ — 状态
+- utils/ — 工具
+按实际扫描填，不要套 Vue 的固定模板>
 
-### server/
-<扫描到的目录树，带简要说明>
+### 后端目录（如适用）
+<扫描到的实际目录树。典型可能包括：
+- controller/ 或 routes/ 或 handlers/ — 路由/控制层
+- service/ — 业务逻辑
+- model/ 或 dao/ 或 repositories/ — 数据层
+- middleware/ — 中间件
+- proto/ 或 schemas/ — 接口定义（如适用）
+- utils/ — 工具
+- config/ — 配置
+按实际扫描填>
 
 ## 常用命令
-- **启动（前后端）**: `<detected>`
-- **前端构建**: `<detected>`
-- **Node 层测试**: `<detected>`
-- **Lint**: `<detected>`
-- **Typecheck**: `<detected>`
-- **单元测试**: `<detected>`
+- **启动**：<实际的 npm/pnpm/yarn 命令>
+- **构建**：<...>
+- **测试**：<...>
+- **Lint**：<...>
+- **Typecheck**：<...>
+（全栈项目请分别列出前端和后端的命令，或用 monorepo 的聚合命令）
 
-## srpc 服务
-识别到的 proto 文件：
-- `<file>` — <purpose, inferred from content>
+## 代码规范
 
-## 团队代码规范（强制遵守）
-
-### 必须项
-- 文件用 UTF-8 无 BOM、\n 换行
-- 单文件 ≤ 2000 行（Vue 组件 ≤ 800）
-- 单函数 ≤ 50 行，参数 ≤ 5 个
-- 4 空格缩进，单引号，分号结尾
-- 大括号悬挂式、必须包裹
-- 禁止魔法数字
+### 通用规范（跨栈强制）
+- 文件 UTF-8 无 BOM、\n 换行
+- 命名：有意义的英文 + 数字 + 下划线
+- 变量驼峰、常量 UPPER_SNAKE_CASE、布尔值 is/can/has/should 开头
+- CRUD 动词前缀：add/del/update/get/getXxxList/count
+- 函数以动词命名
 - 异常类以 Error 结尾
-- 箭头函数（除 this 场景）
+- 禁止魔法数字
+- 单函数 ≤ 50 行，参数 ≤ 5 个
+- if 嵌套 ≤ 4 层，for ≤ 3 层
 
-### 前端必须项
-- 所有接口调用 .catch() + 异常日志上报
-- 所有用户可见文案走 i18n
+### 前端规范（如适用）
+<按扫描到的框架和团队习惯填写。示例字段（根据实际栈选择保留）：
+- 框架特定范式（如 Vue 的 Composition API 偏好 / React 的 hooks 规则 / Angular 的服务注入）
+- 组件大小约束（如 Vue SFC ≤ 800 行）
+- 接口调用走 services/api 层
+- 所有用户可见文案走 i18n（如项目使用 i18n）
 - 频繁操作加防抖/节流
 - 接口超时显式设置
 - 不稳定数据必须参数校验
 - 接口返回数据必须兜底 + 上报
-- 用 composables，不用 EventBus
+>
 
-### Node 层必须项
-- 接口响应格式：`{ code: int, message: string, data }`
-- code < 0（非业务）/ = 0（正常）/ > 0（业务异常）
-- 应返回数组时无数据返 []
-- 每个新接口需 proto
-- 每个接口需请求量/成功量/失败量上报
-- 日志不含隐私信息
-- Controller 间不互调
-- 外部调用超时 ≤ 1s，内部 ≤ 500ms
-- 重试 ≤ 3 次且幂等
+### 后端规范（如适用）
+<按扫描到的框架和团队习惯填写。示例字段：
+- 接口响应格式（如 `{ code: int, message: string, data }`）
+- code 值规范（如 <0 非业务 / =0 正常 / >0 业务异常）
+- 每个新接口是否需要接口定义文件（proto / OpenAPI）
+- 日志级别使用规范（Error / Warning / Info / Debug）
+- 日志格式（msg / input / code）
+- 隐私信息禁止记录清单（手机号、住址、金融数据等）
+- 监控上报要求（请求量/成功量/失败量）
+- 控制层互相调用规则
+- 外部调用超时和重试
+- 缓存 key 管理规则
+>
 
-## 代码分层
+### 其他强制项
+<根据代码扫描和用户回答填入，例如：
+- 是否强制 TypeScript
+- 是否有提交前 lint/typecheck 钩子
+- 是否有敏感文件禁改清单
+>
 
-### 前端
-- `src/pages/<menu>/views/` — 展示页面
-- `src/pages/<menu>/components/` — 页面内组件
-- `src/pages/<menu>/composables/` — 页面内组合式函数
-- `src/pages/<menu>/services/` — 页面内接口
-- `src/pages/<menu>/constants/` — 页面内常量
-- `src/pages/<menu>/store/` — 页面内状态
-- `src/components/` — 项目级公共组件
-- `src/composables/` — 项目级组合式函数
-- `src/services/` — 项目级公共接口
-- `src/utils/` — 项目级工具
+## Git 规范
 
-### Node 层
-- `controller/` — 参数校验 + 转发（**不能互相调用**）
-- `service/` — 业务逻辑
-- `model/` — 数据访问
-- `middleware/` — 中间件
-- `extend/` — 依赖 ctx 的方法
-- `utils/` — 纯逻辑工具
-- `proto/` — srpc 接口描述
-- `constants/` — 业务常量
-- `config/` — 启动配置
-
-类名**不带分层后缀**（Error 类除外）。
-
-## Git Commit 规范
-
-### 格式
-```
+### Commit Message 格式
 <type>(<scope>): <subject>
-```
 
 ### type
-- `feat` / `fix` / `docs` / `style` / `refactor` / `perf` / `test` / `chore` / `revert`
+feat / fix / docs / style / refactor / perf / test / chore / revert
 
-### 示例
-```
-fix(model): creatAt 字段缺失
-feat(controller): 用户查询接口开发
-refactor(composable): 抽离表单校验逻辑
-```
+### scope
+基于本项目结构的候选：
+<按扫描到的目录/分层列出，例如：
+- 前端：view / component / composable / hook / service / store / router / util / const / 或业务模块名
+- 后端：controller / route / service / model / middleware / proto / schema / config / util / const
+按实际调整>
 
 ### 规则
 - subject ≤ 50 字符
 - 中文描述优先
 - 结尾不加标点
 
-### 分支
-- 功能：`feature/<特性名>`
-- 修复：`hotfix/<问题名>`
+### 示例
+<按本项目的 scope 候选给 3-5 个示例>
+
+### 分支命名
+- 功能：feature/<特性名>
+- 修复：hotfix/<问题名>
+（或按团队已有规范调整）
 
 ## 特殊约定
-<从用户回答填入>
+<Step 7 用户回答填入>
 
 ## 不要碰的模块
-<从用户回答填入>
+<Step 7 用户回答填入>
 
 ## 开发环境
-- Node ≥ 22.16
-- Vue ≥ 3.5
-- 推荐 pnpm
+<从 package.json 的 engines 字段 或 .nvmrc 或 .node-version 读；扫不到则"<待补充>"
+- Node: >= XX
+- 推荐包管理器: pnpm / npm / yarn>
 ```
 
-### Step 4: Report
+### Step 9: 报告
 
 告诉用户：
-- CLAUDE.md 生成位置
-- 哪些信息是扫描得到的
-- 哪些信息需要手工补充
-- 建议 review 后提交到 git
+- CLAUDE.md 生成位置（项目根目录）
+- 哪些字段是扫描推断得出的（列出）
+- 哪些字段来自用户回答（列出）
+- 哪些字段标记为 `<待补充>`，需要人工补上（列出，并说明怎么补）
+- 如有备份：告知 `CLAUDE.md.bak` 位置
+- 建议：review 一遍后提交到 git，后续 agent 都会读这份文档
 
 ## Rules
 
-- **Do NOT invent information** —— 无法检测且用户没回答的，标记 `<待补充>`
-- 扫描要全面但不要读取测试数据或构建产物
+- **不要假设任何默认技术栈**
+- **不要编造未扫描到的信息**，标 `<待补充>` 就好
+- **不要重复问用户能扫出来的信息**
+- 扫描时跳过 `node_modules` / `dist` / `build` / `.git` / 测试数据 / 自动生成代码
 - 如果 CLAUDE.md 已存在，先备份为 `CLAUDE.md.bak` 再覆盖，并告知用户
+- 模板里的 `<...>` 是占位符，生成时必须替换成实际值或明确的 `<待补充>`
+- **遇到扫不出来的关键字段**（如前端框架、后端框架）就直接问用户，不要硬猜
