@@ -1,5 +1,5 @@
 ---
-description: Add a new skill or enable an existing MCP plugin. Claude guides the user through config, edits the right files, and validates the result. Use this instead of manual file editing.
+description: 添加新 skill 或启用已有 MCP 插件。Claude 引导用户完成配置、编辑相关文件并验证结果。请用此命令而非手动编辑文件。
 argument-hint: <what capability you want to add, in plain language>
 ---
 

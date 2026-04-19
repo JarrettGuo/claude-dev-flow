@@ -1,5 +1,5 @@
 ---
-description: Analyze a completed /dev or /fix run by reading its FLOW.log and artifacts. Identify issues and optionally apply fixes (with confirmation). Defaults to "can-modify" mode with a user confirmation gate before any code change. Max 2 fix rounds.
+description: 通过读取 FLOW.log 和产物分析已完成的 /dev 或 /fix 运行记录，找出并修复问题。默认"可修改"模式，任何代码改动前需用户确认。最多 2 轮修复。
 argument-hint: <feature-or-bug-name> [optional: additional context or "only-analyze"]
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Run adversarial review on uncommitted changes or a specific file, without the full dev flow.
+description: 对未提交的改动或指定文件进行对抗性审查，无需完整 dev 流程。
 argument-hint: [file-path or empty for git diff]
 ---
 

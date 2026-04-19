@@ -1,5 +1,5 @@
 ---
-description: Generate a standards-compliant commit message for current changes, following the team's Angular-simplified convention.
+description: 为当前改动生成符合团队规范的 commit 消息，遵循 Angular 简化版约定。
 argument-hint: [optional hint about the change]
 ---
 

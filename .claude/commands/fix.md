@@ -1,5 +1,5 @@
 ---
-description: Run the full bug fix flow. Orchestrates bug-analyst → debugger → implementer → reviewer with focus on minimal, safe, regression-proof fixes. Project stack and standards are read from CLAUDE.md.
+description: 运行完整 bug 修复流程。协调 bug-analyst → debugger → implementer → reviewer，聚焦最小化、安全、防回归的修复方案。项目技术栈和规范从 CLAUDE.md 读取。
 argument-hint: <bug description, error message, or bug report URL>
 ---
 

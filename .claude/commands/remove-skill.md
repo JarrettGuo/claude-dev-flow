@@ -1,5 +1,5 @@
 ---
-description: Disable an MCP plugin, remove a skill, or downgrade a skill's routing. Claude searches, confirms, edits the right files, and preserves degradation paths.
+description: 禁用 MCP 插件、移除 skill 或降级 skill 路由。Claude 搜索、确认、编辑相关文件并保留降级路径。
 argument-hint: <what you want to remove or disable, in plain language>
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Auto-generate CLAUDE.md by scanning the project structure, detecting tech stack and conventions, and asking minimal clarifying questions. Supports full-stack / frontend-only / backend-only projects with any framework.
+description: 通过扫描项目结构、检测技术栈和规范，自动生成 CLAUDE.md，只需最少的问题澄清。支持全栈/纯前端/纯后端项目，兼容任意框架。
 ---
 
 You are going to generate a comprehensive `CLAUDE.md` for this project.

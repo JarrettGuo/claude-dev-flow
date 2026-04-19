@@ -1,5 +1,5 @@
 ---
-description: Run the full development flow for a feature. Orchestrates analyst → architect → implementer-fe/be → reviewer → debugger, ending with a standards-compliant commit suggestion. Project stack and standards are read from CLAUDE.md.
+description: 运行完整功能开发流程。协调 analyst → architect → implementer-fe/be → reviewer → debugger，最终给出符合规范的 commit 建议。项目技术栈和规范从 CLAUDE.md 读取。
 argument-hint: <feature description or requirement doc URL>
 ---
 
