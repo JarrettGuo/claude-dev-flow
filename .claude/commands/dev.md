@@ -180,6 +180,31 @@ Handle the result:
   progress_phase_complete 4 "$ELAPSED" 2>/dev/null || true
   date +%s > .dev-flow/.phase-start
   progress_phase_start "Commit" 5 6 "orchestrator" 2>/dev/null || true
+
+# 智能 commit 分组检测
+CHANGED=$(git diff --name-only; git diff --cached --name-only | sort -u)
+FILE_COUNT=$(echo "$CHANGED" | grep -c . || echo 0)
+TOP_DIRS=$(echo "$CHANGED" | awk -F'/' '{print $1}' | sort -u | grep -c . || echo 0)
+
+# 识别文件类型：代码/测试/配置/文档
+TYPE_COUNT=0
+echo "$CHANGED" | grep -qE '\.(js|ts|vue|tsx|jsx|py|go|rs|java|c|cpp|h)$' && TYPE_COUNT=$((TYPE_COUNT+1))
+echo "$CHANGED" | grep -qE '(\.test\.|\.spec\.|/tests?/|/__tests__/)' && TYPE_COUNT=$((TYPE_COUNT+1))
+echo "$CHANGED" | grep -qE '(\.json|\.yml|\.yaml|\.toml|\.ini|\.env)$|/config/' && TYPE_COUNT=$((TYPE_COUNT+1))
+echo "$CHANGED" | grep -qE '(\.md$|/docs?/)' && TYPE_COUNT=$((TYPE_COUNT+1))
+
+SUGGEST_SPLIT="false"
+if [ "$FILE_COUNT" -ge 8 ] || [ "$TOP_DIRS" -ge 2 ] || [ "$TYPE_COUNT" -ge 3 ]; then
+  SUGGEST_SPLIT="true"
+fi
+
+if [ "$SUGGEST_SPLIT" = "true" ]; then
+  printf "[%s] ∙ ACTION 改动规模较大 (文件=%s 目录=%s 类型=%s)，建议走 commit-split 分组\n" \
+   "$TS" "$FILE_COUNT" "$TOP_DIRS" "$TYPE_COUNT" | tee -a "$LOG" >&2
+else
+  printf "[%s] ∙ ACTION 改动规模适中 (文件=%s)，走 format-commit 单 commit\n" \
+   "$TS" "$FILE_COUNT" | tee -a "$LOG" >&2
+fi
   ```
   进入 Phase 5
   
@@ -204,6 +229,14 @@ Handle the result:
 
 Use the `format-commit` skill to analyze the current changes and produce a commit message.
 
+**执行逻辑**（读上面 bash 块产出的 `SUGGEST_SPLIT` 变量）：
+- `SUGGEST_SPLIT=true` → 调用 `commit-split` skill，输出多组 commit 建议
+- `SUGGEST_SPLIT=false` → 调用 `format-commit` skill，输出单个 commit 建议
+
+用户也可以手动指定模式：
+- `/commit`：强制走单 commit 模式
+- `/commit --split`：强制走分组模式
+
 **拆分策略（按 CLAUDE.md 的 Git 规范 + 项目类型决定）**：
 
 - **full-stack 项目，前后端都改**：默认建议拆分成两个 commit，scope 分别对应前端和后端的分层（具体 scope 值参考 CLAUDE.md 的 Git Commit 规范段落）
@@ -218,6 +251,15 @@ Use the `format-commit` skill to analyze the current changes and produce a commi
 ```
 
 **绝不自动执行 `git commit`** — 只给用户命令和建议。
+
+**何时自动调用 `commit-split` skill**：
+- 改动文件数 ≥ 8
+- 改动跨越 ≥ 2 个顶级目录
+- 改动跨越 ≥ 3 种文件类型（代码 / 测试 / 配置 / 文档）
+
+任一条件满足 → 自动走分组模式，输出多组 commit 建议。否则走 `format-commit` 生成单个 commit。
+
+无论哪种模式，用户最终看到的都是 **命令建议**，永不自动执行 git commit。
 
 Commit 建议完成后，在进入 Phase 6 前写日志：
 
