@@ -348,7 +348,50 @@ feat / fix / docs / style / refactor / perf / test / chore / revert
 - 推荐包管理器: pnpm / npm / yarn>
 ```
 
-### Step 9: 报告
+### Step 9: 检查和完善 .gitignore
+
+检查 `.gitignore` 是否存在 CLAUDE Dev Flow 框架相关规则，减少 IDE 纷争和 git 历史污染。
+
+**如果 `.gitignore` 不存在**：跳过此步骤，直接进入 Step 10。
+
+**如果 `.gitignore` 存在**：执行以下检查脚本：
+
+```bash
+MISSING_RULES=()
+
+# 框架运行时文件
+grep -q "^\.dev-flow/$" .gitignore || MISSING_RULES+=(".dev-flow/")
+grep -q "^\.claude/agent-memory-local/$" .gitignore || MISSING_RULES+=(".claude/agent-memory-local/")
+grep -q "^\\.claude/settings\\.local\\.json$" .gitignore || MISSING_RULES+=(".claude/settings.local.json")
+grep -q "^\\.claude/\\.cache/$" .gitignore || MISSING_RULES+=(".claude/.cache/")
+grep -q "^\\*.log\\.backup$" .gitignore || MISSING_RULES+=("*.log.backup")
+
+# 环境文件（可选）
+grep -q "^\.env\\.local$" .gitignore || MISSING_RULES+=(".env.local")
+grep -q "^\.env\\..*\\.local$" .gitignore || MISSING_RULES+=(".env.*.local")
+
+if [ ${#MISSING_RULES[@]} -gt 0 ]; then
+  echo "⚠️ .gitignore 缺失以下框架相关规则："
+  for rule in "\${MISSING_RULES[@]}"; do
+    echo " - $rule"
+  done
+  echo ""
+  echo "是否添加这些 ignore 规则？[y/n]"
+  read -r response
+  if [ "$response" = "y" ]; then
+    for rule in "\${MISSING_RULES[@]}"; do
+      echo "$rule" >> .gitignore
+    done
+    echo "✓ 已添加缺失的规则"
+  else
+    echo "跳过 .gitignore 更新"
+  fi
+else
+  echo "✓ .gitignore 已包含所有必需规则"
+fi
+```
+
+### Step 10: 报告
 
 告诉用户：
 - CLAUDE.md 生成位置（项目根目录）
