@@ -46,9 +46,18 @@ sed -i "s|PWD_PLACEHOLDER|$(pwd)|" "$LOG"
 # 写启动事件（文件+终端）
 TS=$(date +"%H:%M:%S")
 printf "[%s] ▶ START /fix 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：初始化
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_init "/fix" 7 2>/dev/null || true
 printf "[%s] ∙ INPUT %s\n" "$TS" "<用户输入的简短摘要，≤60字符>" | tee -a "$LOG" >&2
 printf "\n─── Phase 1: Analyze ──────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 1 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 1 开始
+date +%s > .dev-flow/.phase-start
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_start "Analyze" 1 7 "bug-analyst" 2>/dev/null || true
 ```
 
 然后 invoke `@bug-analyst` with the user's input. The agent will use `read-requirement` + `fetch-error-context` skills to gather full context.
@@ -77,6 +86,13 @@ TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ DECISION 用户确认问题描述 → 进入 Phase 2\n" "$TS" | tee -a "$LOG" >&2
 printf "\n─── Phase 2: Diagnose ─────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 2 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 1 完成 + Phase 2 开始
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 1 "$ELAPSED" 2>/dev/null || true
+date +%s > .dev-flow/.phase-start
+progress_phase_start "Diagnose" 2 7 "debugger" 2>/dev/null || true
 ```
 
 ### Phase 2: Diagnose (root cause analysis)
@@ -120,6 +136,13 @@ TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ DECISION 用户确认根因 → 进入 Phase 3\n" "$TS" | tee -a "$LOG" >&2
 printf "\n─── Phase 3: Plan ────────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 3 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 2 完成 + Phase 3 开始
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 2 "$ELAPSED" 2>/dev/null || true
+date +%s > .dev-flow/.phase-start
+progress_phase_start "Plan" 3 7 "architect" 2>/dev/null || true
 ```
 
 ### Phase 3: Plan the fix (lightweight)
@@ -168,6 +191,13 @@ TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ DECISION 用户确认修复方案 → 进入 Phase 4\n" "$TS" | tee -a "$LOG" >&2
 printf "\n─── Phase 4: Implement ─────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 4 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 3 完成 + Phase 4 开始
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 3 "$ELAPSED" 2>/dev/null || true
+date +%s > .dev-flow/.phase-start
+progress_phase_start "Implement" 4 7 "implementer" 2>/dev/null || true
 ```
 
 ### Phase 4: Implement the fix
@@ -202,6 +232,13 @@ TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ DECISION 修复实现完成 → 进入 Phase 5\n" "$TS" | tee -a "$LOG" >&2
 printf "\n─── Phase 5: Verify ──────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 4 完成 + Phase 5 开始
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 4 "$ELAPSED" 2>/dev/null || true
+date +%s > .dev-flow/.phase-start
+progress_phase_start "Verify" 5 7 "implementer" 2>/dev/null || true
 ```
 
 ### Phase 5: Verify
@@ -231,6 +268,13 @@ TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ DECISION 验证通过 → 进入 Phase 6\n" "$TS" | tee -a "$LOG" >&2
 printf "\n─── Phase 6: Review ──────────────────────────────────────\n" | tee -a "$LOG" >&2
 printf "[%s] ▶ PHASE Phase 6 启动\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 5 完成 + Phase 6 开始
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 5 "$ELAPSED" 2>/dev/null || true
+date +%s > .dev-flow/.phase-start
+progress_phase_start "Review" 6 7 "reviewer" 2>/dev/null || true
 ```
 
 ### Phase 6: Review
@@ -250,6 +294,13 @@ Handle:
   printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" | tee -a "$LOG" >&2
   printf "\n─── Phase 7: Commit & Summary ────────────────────────────\n" | tee -a "$LOG" >&2
   printf "[%s] ▶ PHASE Phase 7 启动\n" "$TS" | tee -a "$LOG" >&2
+
+  # 进度可视化：Phase 6 完成 + Phase 7 开始
+  ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+  source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+  progress_phase_complete 6 "$ELAPSED" 2>/dev/null || true
+  date +%s > .dev-flow/.phase-start
+  progress_phase_start "Commit" 7 7 "orchestrator" 2>/dev/null || true
   ```
   进入 Phase 7
   
@@ -317,6 +368,12 @@ Write final report to `.dev-flow/fixes/<bug-name>/summary.md`:
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
 printf "[%s] ✓ COMPLETE /fix 流程完成\n" "$TS" | tee -a "$LOG" >&2
+
+# 进度可视化：Phase 7 完成 + 清理临时状态
+ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
+source .claude/skills/progress-display/progress.bash 2>/dev/null || true
+progress_phase_complete 7 "$ELAPSED" 2>/dev/null || true
+rm -f .dev-flow/.phase-start
 
 # footer
 cat >> "$LOG" <<EOF
