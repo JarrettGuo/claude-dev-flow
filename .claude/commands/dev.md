@@ -140,7 +140,7 @@ Handle the result:
   ```bash
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
-  printf "[%s] ✓ COMPLETE Review APPROVED\n" "$TS" | tee -a "$LOG" >&2
+  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" | tee -a "$LOG" >&2
   printf "\n─── Phase 5: Commit Suggestion ────────────────────────────\n" | tee -a "$LOG" >&2
   printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS" | tee -a "$LOG" >&2
   ```
@@ -151,7 +151,7 @@ Handle the result:
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
   ROUND="<当前轮次>"  # 1/2/3
-  printf "[%s] ↻ RETRY Review CHANGES_REQUESTED (round %s/3)\n" "$TS" "$ROUND" | tee -a "$LOG" >&2
+  printf "[%s] ↻ RETRY Review 要求修改（第 %s 轮/共3轮）\n" "$TS" "$ROUND" | tee -a "$LOG" >&2
   ```
   用 review 反馈再 invoke 对应 implementer，再 invoke reviewer。**最多 3 轮** — 超过后暂停并询问用户如何处理
   
@@ -159,7 +159,7 @@ Handle the result:
   ```bash
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
-  printf "[%s] ✗ ERROR Review BLOCKED，invoke debugger\n" "$TS" | tee -a "$LOG" >&2
+  printf "[%s] ✗ ERROR Review 被阻止，invoke debugger\n" "$TS" | tee -a "$LOG" >&2
   ```
   invoke `@debugger`，然后回到 Phase 3
 
