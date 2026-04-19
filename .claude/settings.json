@@ -1,5 +1,11 @@
 {
   "$comment": "项目级 Claude Code 设置。hooks 用来为 flow-log 能力提供自动记录。脚本位于 .claude/hooks/flow-log.sh。",
+  "progressDisplay": {
+    "enabled": true,
+    "style": "full",
+    "showTimeEstimate": true,
+    "clearScreen": false
+  },
   "hooks": {
     "SubagentStart": [
       {
