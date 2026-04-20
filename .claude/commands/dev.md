@@ -24,6 +24,13 @@ mkdir -p ".dev-flow/${FEATURE}"
 echo "$FEATURE" > ".dev-flow/.current-flow"
 
 LOG=".dev-flow/${FEATURE}/FLOW.log"
+
+# 日志写入函数（默认只写文件，FLOW_LOG_STDERR=1 时同时输出到 stderr）
+log_write() {
+  echo "$1" >> "$LOG"
+  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && echo "$1" >&2
+}
+
 cat > "$LOG" <<'EOF'
 ═══════════════════════════════════════════════════════════
  FLOW LOG: <feature-name>
@@ -34,20 +41,23 @@ cat > "$LOG" <<'EOF'
 
 EOF
 
-# 替换占位符
-sed -i "s|TIMESTAMP_PLACEHOLDER|$(date +'%Y-%m-%d %H:%M:%S')|" "$LOG"
-sed -i "s|PWD_PLACEHOLDER|$(pwd)|" "$LOG"
+# 替换占位符（BSD sed 兼容）
+sed -i '' "s|TIMESTAMP_PLACEHOLDER|$(date +'%Y-%m-%d %H:%M:%S')|" "$LOG"
+sed -i '' "s|PWD_PLACEHOLDER|$(pwd)|" "$LOG"
 
-# 写启动事件（文件+终端）
-TS=$(date +"%H:%M:%S")
-printf "[%s] ▶ START /dev 启动\n" "$TS" | tee -a "$LOG" >&2
+# 写启动事件（合并为单个块）
+{
+  TS=$(date +"%H:%M:%S")
+  printf "[%s] ▶ START /dev 启动\n" "$TS"
+  printf "[%s] ∙ INPUT %s\n" "$TS" "<用户输入的简短摘要，≤60字符>"
+  printf "\n─── Phase 1: Analyze ──────────────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 1 启动\n" "$TS"
+} >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && cat <<< "$(<"$LOG")" >&2
 
 # 进度可视化：初始化
 source .claude/skills/progress-display/progress.bash 2>/dev/null || true
 progress_init "/dev" 6 2>/dev/null || true
-printf "[%s] ∙ INPUT %s\n" "$TS" "<用户输入的简短摘要，≤60字符>" | tee -a "$LOG" >&2
-printf "\n─── Phase 1: Analyze ──────────────────────────────────────\n" | tee -a "$LOG" >&2
-printf "[%s] ▶ PHASE Phase 1 启动\n" "$TS" | tee -a "$LOG" >&2
 
 # 进度可视化：Phase 1 开始
 date +%s > .dev-flow/.phase-start
@@ -64,7 +74,8 @@ After it completes:
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ⏸ GATE 等待用户确认需求\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ⏸ GATE 等待用户确认需求\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ⏸ GATE 等待用户确认需求\n" "$TS" >&2
 ```
 
 2. Show the requirements doc summary and ask: "需求确认？(y / n / 编辑)"
@@ -74,9 +85,14 @@ printf "[%s] ⏸ GATE 等待用户确认需求\n" "$TS" | tee -a "$LOG" >&2
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ DECISION 用户确认需求 → 进入 Phase 2\n" "$TS" | tee -a "$LOG" >&2
-printf "\n─── Phase 2: Design ───────────────────────────────────────\n" | tee -a "$LOG" >&2
-printf "[%s] ▶ PHASE Phase 2 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ DECISION 用户确认需求 → 进入 Phase 2\n" "$TS" >> "$LOG"
+printf "\n─── Phase 2: Design ───────────────────────────────────────\n" >> "$LOG"
+printf "[%s] ▶ PHASE Phase 2 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && {
+  printf "[%s] ✓ DECISION 用户确认需求 → 进入 Phase 2\n" "$TS"
+  printf "\n─── Phase 2: Design ───────────────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 2 启动\n" "$TS"
+} >&2
 
 # 进度可视化：Phase 1 完成 + Phase 2 开始
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
@@ -96,7 +112,8 @@ After it completes:
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ⏸ GATE 等待用户确认设计\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ⏸ GATE 等待用户确认设计\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ⏸ GATE 等待用户确认设计\n" "$TS" >&2
 ```
 
 2. Show design summary highlighting:
@@ -112,9 +129,14 @@ printf "[%s] ⏸ GATE 等待用户确认设计\n" "$TS" | tee -a "$LOG" >&2
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ DECISION 用户确认设计 → 进入 Phase 3\n" "$TS" | tee -a "$LOG" >&2
-printf "\n─── Phase 3: Implement ─────────────────────────────────────\n" | tee -a "$LOG" >&2
-printf "[%s] ▶ PHASE Phase 3 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ DECISION 用户确认设计 → 进入 Phase 3\n" "$TS" >> "$LOG"
+printf "\n─── Phase 3: Implement ─────────────────────────────────────\n" >> "$LOG"
+printf "[%s] ▶ PHASE Phase 3 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && {
+  printf "[%s] ✓ DECISION 用户确认设计 → 进入 Phase 3\n" "$TS"
+  printf "\n─── Phase 3: Implement ─────────────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 3 启动\n" "$TS"
+} >&2
 
 # 进度可视化：Phase 2 完成 + Phase 3 开始
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
@@ -150,9 +172,14 @@ If any implementer reports a blocker, invoke `@debugger` with the blocker, then 
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ DECISION 实现完成 → 进入 Phase 4\n" "$TS" | tee -a "$LOG" >&2
-printf "\n─── Phase 4: Review ──────────────────────────────────────\n" | tee -a "$LOG" >&2
-printf "[%s] ▶ PHASE Phase 4 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ DECISION 实现完成 → 进入 Phase 4\n" "$TS" >> "$LOG"
+printf "\n─── Phase 4: Review ──────────────────────────────────────\n" >> "$LOG"
+printf "[%s] ▶ PHASE Phase 4 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && {
+  printf "[%s] ✓ DECISION 实现完成 → 进入 Phase 4\n" "$TS"
+  printf "\n─── Phase 4: Review ──────────────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 4 启动\n" "$TS"
+} >&2
 
 # 进度可视化：Phase 3 完成 + Phase 4 开始
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
@@ -170,9 +197,14 @@ Handle the result:
   ```bash
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
-  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" | tee -a "$LOG" >&2
-  printf "\n─── Phase 5: Commit Suggestion ────────────────────────────\n" | tee -a "$LOG" >&2
-  printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS" | tee -a "$LOG" >&2
+  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
+printf "\n─── Phase 5: Commit Suggestion ────────────────────────────\n" >> "$LOG"
+printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && {
+  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS"
+  printf "\n─── Phase 5: Commit Suggestion ────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 5 启动\n" "$TS"
+} >&2
 
   # 进度可视化：Phase 4 完成 + Phase 5 开始
   ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
@@ -200,10 +232,14 @@ fi
 
 if [ "$SUGGEST_SPLIT" = "true" ]; then
   printf "[%s] ∙ ACTION 改动规模较大 (文件=%s 目录=%s 类型=%s)，建议走 commit-split 分组\n" \
-   "$TS" "$FILE_COUNT" "$TOP_DIRS" "$TYPE_COUNT" | tee -a "$LOG" >&2
+   "$TS" "$FILE_COUNT" "$TOP_DIRS" "$TYPE_COUNT" >> "$LOG"
+  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 改动规模较大 (文件=%s 目录=%s 类型=%s)，建议走 commit-split 分组\n" \
+   "$TS" "$FILE_COUNT" "$TOP_DIRS" "$TYPE_COUNT" >&2
 else
   printf "[%s] ∙ ACTION 改动规模适中 (文件=%s)，走 format-commit 单 commit\n" \
-   "$TS" "$FILE_COUNT" | tee -a "$LOG" >&2
+   "$TS" "$FILE_COUNT" >> "$LOG"
+  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 改动规模适中 (文件=%s)，走 format-commit 单 commit\n" \
+   "$TS" "$FILE_COUNT" >&2
 fi
   ```
   进入 Phase 5
@@ -213,7 +249,8 @@ fi
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
   ROUND="<当前轮次>"  # 1/2/3
-  printf "[%s] ↻ RETRY Review 要求修改（第 %s 轮/共3轮）\n" "$TS" "$ROUND" | tee -a "$LOG" >&2
+  printf "[%s] ↻ RETRY Review 要求修改（第 %s 轮/共3轮）\n" "$TS" "$ROUND" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ↻ RETRY Review 要求修改（第 %s 轮/共3轮）\n" "$TS" "$ROUND" >&2
   ```
   用 review 反馈再 invoke 对应 implementer，再 invoke reviewer。**最多 3 轮** — 超过后暂停并询问用户如何处理
   
@@ -221,7 +258,8 @@ fi
   ```bash
   LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
   TS=$(date +"%H:%M:%S")
-  printf "[%s] ✗ ERROR Review 被阻止，invoke debugger\n" "$TS" | tee -a "$LOG" >&2
+  printf "[%s] ✗ ERROR Review 被阻止，invoke debugger\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✗ ERROR Review 被阻止，invoke debugger\n" "$TS" >&2
   ```
   invoke `@debugger`，然后回到 Phase 3
 
@@ -266,9 +304,14 @@ Commit 建议完成后，在进入 Phase 6 前写日志：
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ DECISION Commit 建议完成 → 进入 Phase 6\n" "$TS" | tee -a "$LOG" >&2
-printf "\n─── Phase 6: Done ────────────────────────────────────────\n" | tee -a "$LOG" >&2
-printf "[%s] ▶ PHASE Phase 6 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ DECISION Commit 建议完成 → 进入 Phase 6\n" "$TS" >> "$LOG"
+printf "\n─── Phase 6: Done ────────────────────────────────────────\n" >> "$LOG"
+printf "[%s] ▶ PHASE Phase 6 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && {
+  printf "[%s] ✓ DECISION Commit 建议完成 → 进入 Phase 6\n" "$TS"
+  printf "\n─── Phase 6: Done ────────────────────────────────────────\n"
+  printf "[%s] ▶ PHASE Phase 6 启动\n" "$TS"
+} >&2
 
 # 进度可视化：Phase 5 完成 + Phase 6 开始
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
@@ -292,7 +335,8 @@ Final summary:
 ```bash
 LOG=".dev-flow/$(cat .dev-flow/.current-flow)/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ COMPLETE /dev 流程完成\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ COMPLETE /dev 流程完成\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✓ COMPLETE /dev 流程完成\n" "$TS" >&2
 
 # 进度可视化：Phase 6 完成 + 清理临时状态
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))

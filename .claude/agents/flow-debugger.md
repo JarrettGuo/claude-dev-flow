@@ -101,9 +101,12 @@ Classify issues into three categories:
 ```bash
 FLOW_LOG="${TARGET}/FLOW.log"
 TS=$(date +"%H:%M:%S")
-printf "[%s] ▶ PHASE /flow-debug 启动\n" "$TS" | tee -a "$FLOW_LOG" >&2
-printf "[%s] ∙ ACTION 复盘日志和产物完成\n" "$TS" | tee -a "$FLOW_LOG" >&2
-printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS" | tee -a "$FLOW_LOG" >&2
+printf "[%s] ▶ PHASE /flow-debug 启动\n" "$TS" >> "$FLOW_LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ▶ PHASE /flow-debug 启动\n" "$TS" >&2
+printf "[%s] ∙ ACTION 复盘日志和产物完成\n" "$TS" >> "$FLOW_LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 复盘日志和产物完成\n" "$TS" >&2
+printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS" >> "$FLOW_LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS" >&2
 ```
 
 展示给用户以下内容：
@@ -147,7 +150,8 @@ printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS
 
    ```bash
    TS=$(date +"%H:%M:%S")
-   printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" | tee -a "$FLOW_LOG" >&2
+   printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >> "$FLOW_LOG"
+   [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >&2
    ```
 
 2. **改代码**（用 Edit 工具）
@@ -158,7 +162,8 @@ printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS
 
    ```bash
    TS=$(date +"%H:%M:%S")
-   printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" | tee -a "$FLOW_LOG" >&2
+   printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >> "$FLOW_LOG"
+   [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >&2
    ```
 
    告诉用户：
@@ -172,7 +177,8 @@ printf "[%s] ∙ OUTPUT 发现 N 个问题，其中 M 个可自动修复\n" "$TS
 
    ```bash
    TS=$(date +"%H:%M:%S")
-   printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" | tee -a "$FLOW_LOG" >&2
+   printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >> "$FLOW_LOG"
+   [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >&2
    ```
 
 ### Step 7: 如果不修（用户选"n"或类别 A/C 没有可修项）

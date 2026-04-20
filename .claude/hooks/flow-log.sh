@@ -54,6 +54,6 @@ case "$EVENT_TYPE" in
     ;;
 esac
 
-# 双通道：文件 + 终端
+# 写文件（始终）+ 终端（仅当 FLOW_LOG_STDERR=1）
 echo "$LINE" >> "$LOG_FILE"
-echo "$LINE" >&2
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && echo "$LINE" >&2

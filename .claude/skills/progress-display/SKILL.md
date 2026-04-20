@@ -167,7 +167,7 @@ fi
 进度显示**不写入** FLOW.log，只输出到终端。
 FLOW.log 保持完整的文本日志，供 `/flow-debug` 解析。
 
-进度显示函数通过 `tee -a "$LOG" >&2` 将日志写入 FLOW.log，同时通过普通 stdout 输出进度（进度显示函数只输出到 stderr 以分离日志流）。
+进度显示函数默认只输出到终端，不写入 FLOW.log。若需同时输出到 FLOW.log，可配合 `FLOW_LOG_STDERR=1` 环境变量。
 
 ## 使用示例
 

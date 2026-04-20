@@ -7,7 +7,7 @@ description: Write concise progress entries to the current flow's log file, AND 
 
 给整个框架一个"可观察性"能力。每当流程推进（进入 phase / 进入 agent / agent 完成 / 用户确认 / review 结果 / 错误等），都写一行日志。
 
-**双通道**：同一行内容**同时**写入磁盘文件 + 输出到终端。用户开一个 Claude Code 会话就能实时看到进度，不用额外开终端 `tail -f`。
+**双通道**：同一行内容**同时**写入磁盘文件 + 可选输出到终端（默认关闭，需设置 `FLOW_LOG_STDERR=1`）。用户开一个 Claude Code 会话就能实时看到进度，不用额外开终端 `tail -f`。
 
 ## 能力范围
 
@@ -117,17 +117,17 @@ description: Write concise progress entries to the current flow's log file, AND 
 
 所有写入日志的操作**必须**遵循：
 
-1. **双通道**：文件 + 终端同时输出
+1. **默认只写文件，FLOW_LOG_STDERR=1 时同时输出到 stderr**
 
 ```bash
  LOG_FILE=".dev-flow/specs/${FEATURE}/FLOW.log"
  TIMESTAMP=$(date +"%H:%M:%S")
  LINE="[${TIMESTAMP}] ▶ ENTER @analyst"
 
- # 写文件
+ # 写文件（始终）
  echo "$LINE" >> "$LOG_FILE"
- # 打终端（stderr 保证能被用户看到）
- echo "$LINE" >&2
+ # 终端输出（仅当 FLOW_LOG_STDERR=1）
+ [ "${FLOW_LOG_STDERR:-0}" = "1" ] && echo "$LINE" >&2
 ```
 
 2. **一行原则**：每条事件占一行，不换行、不分段

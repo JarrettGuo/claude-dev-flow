@@ -73,7 +73,8 @@ cat > "$LOG" <<EOF
 EOF
 
 TS=$(date +"%H:%M:%S")
-printf "[%s] ▶ START /upgrade 启动\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ▶ START /upgrade 启动\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ▶ START /upgrade 启动\n" "$TS" >&2
 ```
 
 **2.2 拉取远端到临时目录**
@@ -84,10 +85,12 @@ TMPDIR=$(mktemp -d -t claude-dev-flow-upgrade-XXXXXX)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 TS=$(date +"%H:%M:%S")
-printf "[%s] ∙ ACTION 拉取远端: %s\n" "$TS" "$SOURCE_URL" | tee -a "$LOG" >&2
+printf "[%s] ∙ ACTION 拉取远端: %s\n" "$TS" "$SOURCE_URL" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 拉取远端: %s\n" "$TS" "$SOURCE_URL" >&2
 
 git clone --quiet "$SOURCE_URL" "$TMPDIR" || {
- printf "[%s] ✗ ERROR 拉取失败\n" "$(date +%H:%M:%S)" | tee -a "$LOG" >&2
+ printf "[%s] ✗ ERROR 拉取失败\n" "$(date +%H:%M:%S)" >> "$LOG"
+ [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✗ ERROR 拉取失败\n" "$(date +%H:%M:%S)" >&2
  exit 1
 }
 
@@ -95,7 +98,8 @@ REMOTE_SHA=$(cd "$TMPDIR" && git rev-parse HEAD)
 REMOTE_SHORT=$(cd "$TMPDIR" && git rev-parse --short HEAD)
 REMOTE_MSG=$(cd "$TMPDIR" && git log -1 --format='%s')
 
-printf "[%s] ∙ OUTPUT 远端版本: %s (%s)\n" "$(date +%H:%M:%S)" "$REMOTE_SHORT" "$REMOTE_MSG" | tee -a "$LOG" >&2
+printf "[%s] ∙ OUTPUT 远端版本: %s (%s)\n" "$(date +%H:%M:%S)" "$REMOTE_SHORT" "$REMOTE_MSG" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ OUTPUT 远端版本: %s (%s)\n" "$(date +%H:%M:%S)" "$REMOTE_SHORT" "$REMOTE_MSG" >&2
 ```
 
 **2.3 判断是否已经是最新**
@@ -103,7 +107,8 @@ printf "[%s] ∙ OUTPUT 远端版本: %s (%s)\n" "$(date +%H:%M:%S)" "$REMOTE_SH
 ```bash
 if [ "$LOCAL_VERSION" = "$REMOTE_SHA" ]; then
  echo "✓ 已经是最新版本 ($REMOTE_SHORT)，无需升级"
- printf "[%s] ✓ COMPLETE 已是最新\n" "$(date +%H:%M:%S)" | tee -a "$LOG" >&2
+ printf "[%s] ✓ COMPLETE 已是最新\n" "$(date +%H:%M:%S)" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✓ COMPLETE 已是最新\n" "$(date +%H:%M:%S)" >&2
  rm -f .dev-flow/.current-flow
  exit 0
 fi
@@ -120,9 +125,11 @@ HAS_BASE="false"
 if [ -n "$LOCAL_VERSION" ]; then
  if (cd "$TMPDIR" && git cat-file -e "$LOCAL_VERSION" 2>/dev/null); then
  HAS_BASE="true"
- printf "[%s] ∙ ACTION 使用 %s 作为对比基线\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" | tee -a "$LOG" >&2
+ printf "[%s] ∙ ACTION 使用 %s 作为对比基线\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >> "$LOG"
+ [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 使用 %s 作为对比基线\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >&2
  else
- printf "[%s] ⚠ WARN 本地版本 %s 在远端历史中找不到（可能是 force push 或手动改过版本号）\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" | tee -a "$LOG" >&2
+ printf "[%s] ⚠ WARN 本地版本 %s 在远端历史中找不到（可能是 force push 或手动改过版本号）\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >> "$LOG"
+ [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ⚠ WARN 本地版本 %s 在远端历史中找不到（可能是 force push 或手动改过版本号）\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >&2
  fi
 fi
 ```
@@ -241,7 +248,8 @@ done
 ```bash
 BACKUP_DIR=".claude.backup-$(date +%Y%m%d-%H%M%S)"
 cp -r .claude "$BACKUP_DIR"
-printf "[%s] ∙ ACTION 备份到 %s\n" "$(date +%H:%M:%S)" "$BACKUP_DIR" | tee -a "$LOG" >&2
+printf "[%s] ∙ ACTION 备份到 %s\n" "$(date +%H:%M:%S)" "$BACKUP_DIR" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION 备份到 %s\n" "$(date +%H:%M:%S)" "$BACKUP_DIR" >&2
 ```
 
 ## Phase 5 — 执行升级
@@ -334,7 +342,8 @@ cat .claude/.version
 
 ```bash
 TS=$(date +"%H:%M:%S")
-printf "[%s] ✓ COMPLETE /upgrade 完成\n" "$TS" | tee -a "$LOG" >&2
+printf "[%s] ✓ COMPLETE /upgrade 完成\n" "$TS" >> "$LOG"
+[ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ✓ COMPLETE /upgrade 完成\n" "$TS" >&2
 
 cat >> "$LOG" <<EOF
 
