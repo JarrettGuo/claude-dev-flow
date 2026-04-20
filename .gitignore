@@ -40,3 +40,6 @@ build/
 .claude/settings.local.json
 .claude/.cache/
 *.log.backup
+
+export-claude.ipynb
+export-claude.txt

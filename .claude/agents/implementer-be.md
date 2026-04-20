@@ -93,14 +93,26 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
   TS=$(date +"%H:%M:%S")
   # 按需选择下面之一：
-  printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" >&2
+  printf "[%s] ∙ ACTION <简短描述动作，≤60字符>
+" "$TS" >> "$LOG"
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ∙ ACTION <简短描述动作，≤60字符>
+" "$TS" >&2
+  fi
   # 或
-  printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" >&2
+  printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)
+" "$TS" >> "$LOG"
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)
+" "$TS" >&2
+  fi
   # 或
-  printf "[%s] ⚠ WARN <警告内容>\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ⚠ WARN <警告内容>\n" "$TS" >&2
+  printf "[%s] ⚠ WARN <警告内容>
+" "$TS" >> "$LOG"
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ⚠ WARN <警告内容>
+" "$TS" >&2
+  fi
 fi
 ```
 

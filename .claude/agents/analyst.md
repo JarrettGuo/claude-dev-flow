@@ -37,13 +37,19 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   TS=$(date +"%H:%M:%S")
   # 按需选择下面之一：
   printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" >&2
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ∙ ACTION <简短描述动作，≤60字符>\n" "$TS" >&2
+  fi
   # 或
   printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" >&2
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ∙ OUTPUT <产物名> (<大小/要点>)\n" "$TS" >&2
+  fi
   # 或
   printf "[%s] ⚠ WARN <警告内容>\n" "$TS" >> "$LOG"
-  [ "${FLOW_LOG_STDERR:-0}" = "1" ] && printf "[%s] ⚠ WARN <警告内容>\n" "$TS" >&2
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+    printf "[%s] ⚠ WARN <警告内容>\n" "$TS" >&2
+  fi
 fi
 ```
 
@@ -60,68 +66,24 @@ fi
 
 ## Workflow
 
-1. **Get the requirement** — use the `read-requirement` skill to fetch content from wherever the user referenced (URL, file path, or inline text). Do NOT ask the user to repaste content you can fetch yourself.
-2. **Read CLAUDE.md** — understand current project conventions, directory structure, and tech stack.
-3. **Explore the codebase** using Grep/Glob to find:
-   - Similar existing features (to reuse patterns)
-   - Affected modules in the directories mentioned in CLAUDE.md
-   - Existing interface definitions (如 CLAUDE.md 描述了 proto / OpenAPI / schema 文件位置)
-4. **Identify ambiguity** — only ask questions that would change the implementation. Skip questions a reasonable engineer could decide based on existing patterns. Max 3 questions.
-5. **Produce requirements doc** at `.dev-flow/specs/<feature-name>/requirements.md`:
-
-```
-# <Feature Name>
-
-## 功能描述
-One sentence.
-
-## 来源
-<需求文档 URL 或文件路径,或 "inline">
-
-## 用户故事
-作为 [角色],我希望 [能力],以便 [价值]。
-
-## 验收标准
-- [ ] 可测试的具体标准 1
-- [ ] 可测试的具体标准 2
-
-## 影响范围
-
-（根据 CLAUDE.md 描述的项目结构填写。以下为通用示例，按实际情况调整）
-
-### 前端（如项目有前端）
-- 涉及页面：
-- 涉及组件：
-- 涉及接口调用：
-
-### 后端（如项目有后端）
-- 涉及控制器/路由：
-- 涉及服务层：
-- 涉及数据层：
-- 是否需要新接口定义（proto / OpenAPI / schema）：
-- 是否需要新的外部服务调用：
-
-### 无后端的纯前端项目 / 无前端的纯后端项目
-删除不适用的段落，只保留实际相关的。
-
-## 不在范围内
-Prevents scope creep.
-
-## 待确认问题
-Only questions you cannot resolve yourself.
-```
+1. **Read CLAUDE.md** for project context
+2. **Use `read-requirement` skill** to parse input (URL/file/inline)
+3. **Analyze** the requirement:
+   - Identify scope (frontend/backend/both)
+   - List acceptance criteria
+   - Flag ambiguous points
+4. **Write** requirements to `.dev-flow/specs/<feature-name>/requirements.md`
+5. **Log** completion to FLOW.log
 
 ## Rules
 
 遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
 
 - 绝不自动 commit、不 force push
-- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 遵守 `.claude/docs/output-style.md` 的输出风格
 - 不修改用户确认范围外的文件
 
 本 agent 特有规则：
 
-- 绝不写代码——那是 implementer 的工作
-- 绝不提出技术方案——那是 architect 的工作
-- 需求太碎（如"改个按钮文案"）时，直接说明并跳过完整 workflow，不要为琐事生成厚重的 spec
-- read-requirement skill 报告 MCP 缺失时，如实告知用户缺什么，让用户粘贴 inline 内容后继续，不要硬编码假设
+- 需求模糊时先问用户，不要猜测
+- 输出必须包含明确的验收标准
