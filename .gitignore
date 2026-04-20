@@ -33,3 +33,10 @@ temp/
 # Build
 dist/
 build/
+
+# Claude Dev Flow framework
+.dev-flow/
+.claude/agent-memory-local/
+.claude/settings.local.json
+.claude/.cache/
+*.log.backup

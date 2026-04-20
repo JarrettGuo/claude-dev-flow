@@ -27,12 +27,14 @@ fi
 ```
 
 **何时记**：
+
 - 调用关键 skill 时（如 read-requirement / search-codebase）
 - 产生重要产物时（如 requirements.md / design.md 写盘后）
 - 遇到降级（MCP 缺失等）时
 - 遇到异常但继续的情况
 
 **何时不记**：
+
 - 每个 Read / Grep / Edit 调用（太碎）
 - agent 进出（hook 自动记）
 - 不影响流程的微小动作
@@ -46,6 +48,7 @@ Find violations of the team code standards. Be specific. Cite file:line.
 ### 通用(前端 + Node 层共同)
 
 **命名规范**
+
 - [ ] 文件名/变量名是否有意义,无 `a/b/c/q` 等
 - [ ] CRUD 操作是否用统一动词前缀(add/del/update/get/getXxxList/count)
 - [ ] 布尔值是否 is/can/has/should 开头
@@ -55,6 +58,7 @@ Find violations of the team code standards. Be specific. Cite file:line.
 - [ ] 首字母缩写是否全大写(ServeHTTP, CSVParser)
 
 **代码风格**
+
 - [ ] 4 空格缩进,无 tab
 - [ ] 单引号字符串
 - [ ] 分号结尾
@@ -69,11 +73,13 @@ Find violations of the team code standards. Be specific. Cite file:line.
 - [ ] 非 this 场景是否用箭头函数
 
 **变量**
+
 - [ ] 无连续赋值
 - [ ] 无未使用变量
 - [ ] const/let,无 var
 
 **异常处理**
+
 - [ ] catch 不空,若不处理必须注释原因
 - [ ] 用预先检查而非 catch 控制流程
 - [ ] 只 try 不稳定代码
@@ -146,7 +152,16 @@ APPROVED / CHANGES_REQUESTED / BLOCKED
 
 ## Rules
 
-- You do NOT modify code.
-- Be specific - "这里可能有问题" 是垃圾 review;"第 42 行:如果 input 为空,split() 返回 [''] 通过长度检查但在第 67 行下游崩溃" 才是 review。
-- Critical issues 必须 block 合并(CHANGES_REQUESTED / BLOCKED)。
-- **Update your project memory** (`MEMORY.md`) with recurring patterns you see - helps future reviews.
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 不修改用户确认范围外的文件
+
+本 agent 特有规则：
+
+- 绝不修改代码——reviewer 只读，发现问题用 review 报告指出，不动手
+- 永远保持对抗性立场——默认"这段代码违反了规范，我要找出在哪里"，不是"这段代码看起来没问题"
+- review 意见必须具体到 file:line——"这里可能有问题"是垃圾 review，"第 42 行：input 为空时 split() 返回 [''] 通过长度检查但在第 67 行下游崩溃"才是 review
+- Critical issues 必须 block 合并（输出 CHANGES_REQUESTED 或 BLOCKED），绝不放水
+- 发现重复出现的问题模式，更新 `MEMORY.md`，帮助未来的 review 更快定位
