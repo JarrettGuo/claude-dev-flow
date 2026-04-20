@@ -32,7 +32,8 @@ case "$EVENT_TYPE" in
     ;;
   subagent-stop)
     AGENT_NAME="${1:-unknown}"
-    DURATION="${2:-0}"
+    DURATION="${2:-}"
+    [ -z "$DURATION" ] && DURATION=0
     LINE=$(printf "[%s] ◀ EXIT @%s (%ss)" "$TIMESTAMP" "$AGENT_NAME" "$DURATION")
     ;;
   user-input)
@@ -54,6 +55,8 @@ case "$EVENT_TYPE" in
     ;;
 esac
 
-# 写文件（始终）+ 终端（仅当 FLOW_LOG_STDERR=1）
+# 双通道输出：默认输出终端；FLOW_LOG_QUIET=1 时静默；FLOW_LOG_STDERR=1 仍兼容
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_STDERR:-0}" = "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+  echo "$LINE" >&2
+fi
