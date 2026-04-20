@@ -55,11 +55,19 @@ User's arguments: $ARGUMENTS
 - 分组数 2-6 组：正常分组输出
 - 分组数 > 6 组：说明改动太碎，建议用户先 squash 或检查是否混杂了多个独立功能
 
-## 规则（两个模式都适用）
+## Rules
 
-- **绝不自动执行 `git add` 或 `git commit`** —— 只输出命令让用户自己跑
-- **绝不超过 50 字符的 subject**
-- **绝不在 subject 结尾加标点**
-- **绝不 git push**
-- 如果 diff 完全为空，告诉用户没有改动
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则（两个模式都适用）：
+
+- 绝不自动执行 `git add` 或 `git commit`，只输出命令让用户自己跑
+- 绝不 `git push`
+- commit subject 绝不超过 50 字符
+- commit subject 结尾绝不加标点
+- 若 diff 完全为空，告诉用户"没有改动可以 commit"并退出
 - 分组模式下每组 subject 仍遵循 50 字符上限

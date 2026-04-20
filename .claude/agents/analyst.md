@@ -110,7 +110,15 @@ Only questions you cannot resolve yourself.
 
 ## Rules
 
-- Do NOT write code.
-- Do NOT propose technical approach (that's the architect's job).
-- If the request is trivial (e.g., "fix typo in button text"), say so and skip the full workflow.
-- If `read-requirement` skill reports that a referenced doc can't be fetched (MCP missing), tell the user exactly what's needed, then continue with inline description if they provide it.
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 不修改用户确认范围外的文件
+
+本 agent 特有规则：
+
+- 绝不写代码——那是 implementer 的工作
+- 绝不提出技术方案——那是 architect 的工作
+- 需求太碎（如"改个按钮文案"）时，直接说明并跳过完整 workflow，不要为琐事生成厚重的 spec
+- read-requirement skill 报告 MCP 缺失时，如实告知用户缺什么，让用户粘贴 inline 内容后继续，不要硬编码假设

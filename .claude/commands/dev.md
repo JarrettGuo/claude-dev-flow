@@ -315,10 +315,16 @@ rm -f .dev-flow/.current-flow
 
 ## Rules
 
-- **Never skip a phase.** 用户可以 override，但你警告先。
-- **Never do the work in the main conversation.** Always delegate.
-- **Never approve your own implementation.** Reviewer is a separate agent for a reason.
-- **If user says "快点做完别 review"**:
-  > "跳过 review 会增加规范违反和 bug 风险，确认跳过？"
-  用户确认后可以跳过。
-- **Never execute `git commit` automatically.** 只输出命令。
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则：
+
+- 绝不跳过 phase。用户可以 override，但你先警告
+- 绝不在主对话里做实际工作。总是 delegate 给 subagent
+- 绝不 approve 自己的实现。Reviewer 是独立 agent 是有原因的
+- 用户说"快点做完别 review"时，回答："跳过 review 会增加规范违反和 bug 风险，确认跳过？" 用户确认后可以跳过
+- 绝不自动执行 `git commit`，只输出命令

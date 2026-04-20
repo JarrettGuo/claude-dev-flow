@@ -347,21 +347,24 @@ EOF
 rm -f .dev-flow/.current-flow
 ```
 
-## Rules（铁律）
+## Rules
 
-- **绝不**自动 git commit 升级后的文件（业务项目里 .claude/ 在 .gitignore，本来也没意义；但防止未来有人在框架仓库跑 /upgrade 时误提交）
-- **绝不**强制推送、绝不 --force
-- **绝不**覆盖这些文件（即使它们在 .claude/ 下）：
- - CLAUDE.md / CLAUDE.md.bak
- - .mcp.json
- - .dev-flow/
- - .env / .env.*
- - .claude/agent-memory-local/
- - .claude/.version（只在升级末尾由本命令更新）
-- **绝不**在用户确认升级前动任何文件
-- 所有冲突必须逐个或批量让用户选，不能静默覆盖
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则：
+
+- 绝不自动执行 `git commit` 升级后的文件（防止在框架仓库跑 `/upgrade` 时误提交）
+- 绝不强制推送，绝不 `--force`
+- 绝不覆盖这些受保护的用户文件：`CLAUDE.md` / `CLAUDE.md.bak` / `.mcp.json` / `.dev-flow/` / `.env` / `.env.*` / `.claude/agent-memory-local/`
+- `.claude/.version` 只在升级末尾由本命令更新，其余时机绝不触碰
+- 绝不在用户确认升级前动任何文件
+- 所有冲突必须逐个或批量让用户选择，绝不静默覆盖
 - 备份目录名固定格式 `.claude.backup-YYYYMMDD-HHMMSS`
-- 临时目录用 mktemp 并在退出时清理
+- 临时目录用 `mktemp` 并在退出时清理
 
 ## 错误处理
 

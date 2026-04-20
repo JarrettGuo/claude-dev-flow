@@ -111,8 +111,16 @@ fi
 
 ## Rules
 
-- Do NOT propose fixes (that's debugger + implementer's job).
-- Do NOT start editing code.
-- If the user's report is already detailed and reproducible, skip clarifying questions.
-- If the report is too vague to act on (e.g., "登录有问题"), list the minimum info needed to proceed.
-- **Never assume it's user error.** Treat every report as a real bug until proven otherwise.
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 不修改用户确认范围外的文件
+
+本 agent 特有规则：
+
+- 绝不提出修复方案——那是 debugger + implementer 的工作
+- 绝不开始编辑代码
+- 用户报告已经足够详细可复现时，跳过澄清问题
+- 报告太含糊（如"登录有问题"）时，列出最少必要信息让用户补充，不要硬猜
+- 绝不假设是用户错误——每个 bug 报告都当真 bug 对待，直到证据反驳

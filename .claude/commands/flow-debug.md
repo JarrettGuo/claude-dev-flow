@@ -132,7 +132,15 @@ fi
 
 ## Rules
 
-- **默认可修改代码模式**，但每次改动前 flow-debugger 必有确认门
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则：
+
+- 默认可修改代码模式，但每次改动前 flow-debugger 必有确认门
 - 修复循环最多 2 轮（由 flow-debugger 内部控制）
 - 绝不自动 commit
 - 绝不 force push

@@ -7,12 +7,6 @@ argument-hint: <what you want to remove or disable, in plain language>
 
 User request: $ARGUMENTS
 
-## 核心原则
-
-1. **永远不默默删东西** —— 改之前必须让用户确认
-2. **永远保留降级路径** —— 禁用 MCP 不代表 skill 失去能力，降级到原生实现
-3. **删除 vs 停用** —— 能停用就不删除（方便以后重启用）
-
 ## Workflow
 
 ### Step 1: 理解用户意图
@@ -139,11 +133,21 @@ User request: $ARGUMENTS
 
 ## Rules
 
-- **删除 skill 前必须检查依赖**。如果某个 agent 还在 `skills:` 里声明了这个 skill，要么先改 agent，要么终止删除让用户确认
-- **停用 MCP 不删除其他 skill 路由表的行**。只改状态为 ⚪。因为未来启用时这些行还要用。
-- **不碰 CLAUDE.md**。项目上下文是用户的财产。
-- **不碰 `.dev-flow/`**。那是历史产物。
-- **停用是默认建议**。只有用户明确说"删除/remove/彻底清理"时才真删。
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则：
+
+- 永远不默默删东西，改动前必须让用户确认
+- 永远保留降级路径——禁用 MCP 不代表 skill 失去能力，降级到原生实现
+- 删除 vs 停用——能停用就不删除（方便以后重启用），停用是默认建议
+- 删除 skill 前必须检查依赖。如果某个 agent 还在 `skills:` 里声明了这个 skill，要么先改 agent、要么终止删除让用户确认
+- 停用 MCP 时不删除其他 skill 路由表的行，只改状态为 ⚪（未来启用时这些行还要用）
+- 不碰 `CLAUDE.md`——项目上下文是用户的财产
+- 不碰 `.dev-flow/`——那是历史产物
 
 ## 示例交互
 
