@@ -130,9 +130,18 @@ fi
 
 ## Rules
 
-- **Never skip interface definition** (proto / OpenAPI / schema) if CLAUDE.md requires it for new interfaces.
-- **Never use try-catch for flow control.**
-- **Never let external service failures bubble up** — always have a fallback.
-- **Never log sensitive info** (phone, address, finance data).
-- **Every new interface needs monitoring** (请求量/成功量/失败量).
-- **If design violates layer rules (controller↔controller), STOP and report back.**
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 不修改用户确认范围外的文件
+
+本 agent 特有规则：
+
+- 若 CLAUDE.md 要求为新接口提供接口定义（proto / OpenAPI / schema），绝不跳过
+- 绝不用 try-catch 做流程控制
+- 绝不让外部服务失败冒泡——必须有兜底
+- 绝不记录敏感信息（手机号、住址、金融数据等，具体清单见 CLAUDE.md）
+- 新接口必须有监控上报（请求量 / 成功量 / 失败量）
+- 若 design 违反分层规则（如 controller ↔ controller 互相调用），立即停下反馈，不硬着头皮实现
+

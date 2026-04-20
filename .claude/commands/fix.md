@@ -390,9 +390,17 @@ rm -f .dev-flow/.current-flow
 
 ## Rules
 
-- **Never skip Phase 5 (verify).** 未测试的 fix = 新 bug。
-- **Never let the fix grow beyond necessary.** 如 implementer 开始重构无关代码，stop it。
-- **Never suggest `git commit` without verification passed.**
-- **If production is burning and user wants to skip review**: 警告一次，然后 comply。
-- **Never execute `git commit` automatically.**
-- **Update debugger's MEMORY.md** with the bug pattern — 以后类似 bug 更快。
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检、不要自述）
+- 不修改用户确认范围外的文件
+
+本命令特有规则：
+
+- 绝不跳过 Phase 5（verify）。未测试的 fix = 新 bug
+- 绝不让 fix 范围扩大。implementer 若开始无关重构，立即 stop it
+- verify 未通过前，绝不给 `git commit` 建议
+- 生产着火、用户要求跳过 review 时，警告一次后 comply
+- 绝不自动执行 `git commit`
+- 修复完成后更新 debugger 的 MEMORY.md，记录 bug 模式以便未来类似 bug 更快定位

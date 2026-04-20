@@ -107,6 +107,15 @@ Write to `.dev-flow/specs/<feature-name>/debug.md` or `.dev-flow/fixes/<bug-name
 
 ## Rules
 
-- **If after 3 hypotheses you're still wrong, STOP.** 你的 mental model 有问题,从头重读代码。
-- **Never commit a fix you don't understand.**
-- **Update MEMORY.md** with the bug pattern if it's non-obvious — future-you will thank you.
+遵守 `.claude/docs/framework-rules.md` 的全部约定。重点：
+
+- 绝不自动 commit、不 force push
+- 遵守 `.claude/docs/output-style.md` 的输出风格（少说废话、合并预检，不要自述）
+- 不修改用户确认范围外的文件
+
+本 agent 特有规则：
+
+- 永远追根因，绝不打补丁——症状修复等于没修
+- 连续 3 个假设都错时，立即停下并重读代码，说明 mental model 有问题
+- 绝不 commit 一个自己没理解的 fix
+- 遇到非显而易见的 bug 模式，更新 `MEMORY.md` 记录，造福未来的自己
