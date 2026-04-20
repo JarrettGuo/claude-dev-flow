@@ -43,3 +43,4 @@ build/
 
 export-claude.ipynb
 export-claude.txt
+.claude/agent-memory/
