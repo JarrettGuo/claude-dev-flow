@@ -16,17 +16,35 @@ User's bug report: $ARGUMENTS
 FEATURE="fixes/<bug-name>"
 mkdir -p ".dev-flow/${FEATURE}"
 echo "$FEATURE" > ".dev-flow/.current-flow"
-bash .claude/hooks/flow-init.sh "<bug-name>" "/fix" "<摘要>" 1 "Analyze" "bug-analyst" 7
+FLOW_TYPE_OVERRIDE=fixes bash .claude/hooks/flow-init.sh "<bug-name>" "/fix" "<摘要>" 1 "Analyze" "bug-analyst" 7
 ```
 3. invoke `@bug-analyst`
 4. 等待确认：
 ```bash
 bash .claude/hooks/gate-wait.sh "用户确认问题描述"
 ```
-5. 进入 Phase 2：
-```bash
-bash .claude/hooks/decision.sh "用户确认问题描述 → 进入 Phase 2" 2 "Diagnose" "debugger" 7
-```
+
+> 🛑 **STOP — 必须真正停下等待用户**
+>
+> 上一步已经向用户输出了 <Phase 1> 的产出摘要。现在必须把控制权交还给用户。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 向用户提问："问题描述是否准确？确认后进入根因诊断。"
+> 2. **结束本轮 turn**，不要执行任何后续工具调用
+> 3. 等待用户的下一条消息
+>
+> **严禁在未收到用户明确确认前**继续执行下面"用户确认后"段落里的任何 bash。
+>
+> 用户回复可能是："y" / "确认" / "继续" / "ok" / 或带修改意见的长文本。
+> - 如果是确认类回复 → 执行下面"用户确认后"的 bash
+> - 如果是修改意见 → 根据意见调整产出，再次回到本 STOP 门
+> - 如果是 "n" / "不" / "重来" → 回退到上一步重新处理
+
+**用户确认后**（且仅当用户确认后），执行：
+
+> bash .claude/hooks/decision.sh "用户确认问题描述 → 进入 Phase 2" 2 "Diagnose" "debugger" 7
+
+（上面这条是指令，不是可直接运行的代码块——当用户确认后你再把它转成实际的 Bash 工具调用。）
 
 ### Phase 2: Diagnose
 1. invoke `@debugger`（reproduce → isolate → hypothesis → root cause）
@@ -35,10 +53,28 @@ bash .claude/hooks/decision.sh "用户确认问题描述 → 进入 Phase 2" 2 "
 bash .claude/hooks/gate-wait.sh "用户确认根因分析"
 ```
 3. If after 3 rounds still unclear, STOP with guidance
-4. 进入 Phase 3：
-```bash
-bash .claude/hooks/decision.sh "用户确认根因 → 进入 Phase 3" 3 "Plan" "architect" 7
-```
+
+> 🛑 **STOP — 必须真正停下等待用户**
+>
+> 上一步已经向用户输出了 <Phase 2> 的产出摘要。现在必须把控制权交还给用户。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 向用户提问："根因分析是否正确？确认后进入修复方案阶段。"
+> 2. **结束本轮 turn**，不要执行任何后续工具调用
+> 3. 等待用户的下一条消息
+>
+> **严禁在未收到用户明确确认前**继续执行下面"用户确认后"段落里的任何 bash。
+>
+> 用户回复可能是："y" / "确认" / "继续" / "ok" / 或带修改意见的长文本。
+> - 如果是确认类回复 → 执行下面"用户确认后"的 bash
+> - 如果是修改意见 → 根据意见调整产出，再次回到本 STOP 门
+> - 如果是 "n" / "不" / "重来" → 回退到上一步重新处理
+
+**用户确认后**（且仅当用户确认后），执行：
+
+> bash .claude/hooks/decision.sh "用户确认根因 → 进入 Phase 3" 3 "Plan" "architect" 7
+
+（上面这条是指令，不是可直接运行的代码块——当用户确认后你再把它转成实际的 Bash 工具调用。）
 
 ### Phase 3: Plan
 Produce inline fix plan（简短，一页纸）:
@@ -52,12 +88,29 @@ Produce inline fix plan（简短，一页纸）:
 ```
 Ask: "修复方案确认？(y / n / 编辑)"
 
+> 🛑 **STOP — 必须真正停下等待用户**
+>
+> 上一步已经向用户输出了修复方案摘要（根因、修复位置、改动范围、回归测试、风险等级）。现在必须把控制权交还给用户。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 向用户提问："修复方案是否可行？确认后进入实现阶段。"
+> 2. **结束本轮 turn**，不要执行任何后续工具调用
+> 3. 等待用户的下一条消息
+>
+> **严禁在未收到用户明确确认前**继续执行下面"用户确认后"段落里的任何 bash。
+>
+> 用户回复可能是："y" / "确认" / "继续" / "ok" / 或带修改意见的长文本。
+> - 如果是确认类回复 → 执行下面"用户确认后"的 bash
+> - 如果是修改意见 → 根据意见调整修复方案，再次回到本 STOP 门
+> - 如果是 "n" / "不" / "重来" → 回退到根因诊断
+
 If > 20 lines or affects interface contracts，警告并建议 `/dev`。
 
-进入 Phase 4：
-```bash
-bash .claude/hooks/decision.sh "用户确认修复方案 → 进入 Phase 4" 4 "Implement" "implementer" 7
-```
+**用户确认后**（且仅当用户确认后），执行：
+
+> bash .claude/hooks/decision.sh "用户确认修复方案 → 进入 Phase 4" 4 "Implement" "implementer" 7
+
+（上面这条是指令，不是可直接运行的代码块——当用户确认后你再把它转成实际的 Bash 工具调用。）
 
 ### Phase 4: Implement
 **按项目类型调度** implementer，传参：

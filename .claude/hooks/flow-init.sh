@@ -36,7 +36,18 @@ if [ -f "$CURRENT_FLOW_FILE" ]; then
   fi
 fi
 
-FEATURE="specs/${FEATURE_NAME}"
+# flow 类型由 FLOW_TYPE_OVERRIDE 环境变量控制
+# /dev 不传 → 默认 specs（向后兼容）
+# /fix 传 FLOW_TYPE_OVERRIDE=fixes → 写到 fixes/
+FLOW_TYPE="${FLOW_TYPE_OVERRIDE:-specs}"
+
+# 合法性检查：只接受 specs 或 fixes
+if [ "$FLOW_TYPE" != "specs" ] && [ "$FLOW_TYPE" != "fixes" ]; then
+  echo "❌ FLOW_TYPE_OVERRIDE 必须是 'specs' 或 'fixes'（当前: '${FLOW_TYPE}'）" >&2
+  exit 1
+fi
+
+FEATURE="${FLOW_TYPE}/${FEATURE_NAME}"
 mkdir -p ".dev-flow/${FEATURE}"
 echo "$FEATURE" > "$CURRENT_FLOW_FILE"
 
