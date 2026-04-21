@@ -41,9 +41,9 @@ echo "找到: ${TARGET}"
 
 ```bash
 if [ ! -f "${TARGET}/FLOW.log" ]; then
-  echo "⚠️ ${TARGET} 中没有 FLOW.log，可能不是通过 /dev 或 /fix 生成的。"
-  echo "是否继续（Y/n）？"
-  # 等待用户确认
+  echo "❌ ${TARGET} 中没有 FLOW.log，可能不是通过 /dev 或 /fix 生成的。"
+  echo "请确认 FEATURE 名称拼写，或先通过 /dev / /fix 跑一个流程生成日志。"
+  exit 1
 fi
 
 # 看 FLOW.log 是否有 header 和 footer

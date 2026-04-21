@@ -23,10 +23,28 @@ bash .claude/hooks/flow-init.sh "<feature-name>" "/dev" "<摘要>" 1 "Analyze" "
 ```bash
 bash .claude/hooks/gate-wait.sh "用户确认需求"
 ```
-5. 进入 Phase 2：
-```bash
-bash .claude/hooks/decision.sh "用户确认需求 → 进入 Phase 2" 2 "Design" "architect" 6
-```
+
+> 🛑 **STOP — 必须真正停下等待用户**
+>
+> 上一步已经向用户输出了 <Phase 1> 的产出摘要。现在必须把控制权交还给用户。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 向用户提问："需求是否准确？确认后进入设计阶段。"
+> 2. **结束本轮 turn**，不要执行任何后续工具调用
+> 3. 等待用户的下一条消息
+>
+> **严禁在未收到用户明确确认前**继续执行下面"用户确认后"段落里的任何 bash。
+>
+> 用户回复可能是："y" / "确认" / "继续" / "ok" / 或带修改意见的长文本。
+> - 如果是确认类回复 → 执行下面"用户确认后"的 bash
+> - 如果是修改意见 → 根据意见调整产出，再次回到本 STOP 门
+> - 如果是 "n" / "不" / "重来" → 回退到上一步重新处理
+
+**用户确认后**（且仅当用户确认后），执行：
+
+> bash .claude/hooks/decision.sh "用户确认需求 → 进入 Phase 2" 2 "Design" "architect" 6
+
+（上面这条是指令，不是可直接运行的代码块——当用户确认后你再把它转成实际的 Bash 工具调用。）
 
 ### Phase 2: Design
 1. invoke `@architect`
@@ -34,11 +52,28 @@ bash .claude/hooks/decision.sh "用户确认需求 → 进入 Phase 2" 2 "Design
 ```bash
 bash .claude/hooks/gate-wait.sh "用户确认设计"
 ```
-3. Show design summary，询问确认
-4. 进入 Phase 3：
-```bash
-bash .claude/hooks/decision.sh "用户确认设计 → 进入 Phase 3" 3 "Implement" "implementer" 6
-```
+
+> 🛑 **STOP — 必须真正停下等待用户**
+>
+> 上一步已经向用户输出了 <Phase 2> 的产出摘要。现在必须把控制权交还给用户。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 向用户提问："设计方案是否合理？确认后进入实现阶段。"
+> 2. **结束本轮 turn**，不要执行任何后续工具调用
+> 3. 等待用户的下一条消息
+>
+> **严禁在未收到用户明确确认前**继续执行下面"用户确认后"段落里的任何 bash。
+>
+> 用户回复可能是："y" / "确认" / "继续" / "ok" / 或带修改意见的长文本。
+> - 如果是确认类回复 → 执行下面"用户确认后"的 bash
+> - 如果是修改意见 → 根据意见调整产出，再次回到本 STOP 门
+> - 如果是 "n" / "不" / "重来" → 回退到上一步重新处理
+
+**用户确认后**（且仅当用户确认后），执行：
+
+> bash .claude/hooks/decision.sh "用户确认设计 → 进入 Phase 3" 3 "Implement" "implementer" 6
+
+（上面这条是指令，不是可直接运行的代码块——当用户确认后你再把它转成实际的 Bash 工具调用。）
 
 ### Phase 3: Implement
 **确认项目类型**（frontend-only / backend-only / full-stack），按设计范围调度 implementer：
