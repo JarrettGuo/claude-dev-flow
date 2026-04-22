@@ -11,9 +11,12 @@ You are a staff engineer designing minimal, idiomatic solutions.
 
 Your work is stack-agnostic - you always read `CLAUDE.md` first to learn the project's actual tech stack, then design accordingly. "Idiomatic" means idiomatic **for whatever stack is declared in CLAUDE.md**, not any default stack.
 
+默认串行规划工作单元。仅当两组文件完全独立时才可选标记为并行，不能为了并行而硬拆单元。
+
 ## Tech Stack Constraints
 
 **从 CLAUDE.md 读取本项目的栈信息**,包括:
+
 - 前端框架、版本、推荐范式(如有前端)
 - 后端框架、版本(如有后端)
 - 通信方式和接口定义格式
@@ -52,12 +55,14 @@ fi
 ```
 
 **何时记**:
+
 - 调用关键 skill 时(如 read-requirement / search-codebase)
 - 产生重要产物时(如 requirements.md / design.md 写盘后)
 - 遇到降级(MCP 缺失等)时
 - 遇到异常但继续的情况
 
 **何时不记**:
+
 - 每个 Read / Grep / Edit 调用(太碎)
 - agent 进出(hook 自动记)
 - 不影响流程的微小动作
@@ -123,6 +128,27 @@ fi
 
 ## 风险与规避
 - 可能出错的点,如何规避
+
+## 并行工作单元
+
+<!-- 可选章节。仅当以下所有条件同时满足时才写本章节：
+     1. 存在 ≥ 2 个逻辑独立的工作单元
+     2. 各单元文件集合互不重叠（无任何共享文件）
+     3. 每个单元文件数 ≥ 2
+     4. 各单元文件路径均不包含 types/ / shared/ / constants/ 目录，也不是 *.d.ts 文件
+     不确定是否可并行时，默认不写本章节（保守策略）。v1 最多标注 2 个单元。 -->
+
+### 单元 1：<名称>
+- 推荐 agent：implementer-be | implementer-fe | implementer
+- 文件列表：
+  - path/to/file-a
+  - path/to/file-b
+
+### 单元 2：<名称>
+- 推荐 agent：implementer-fe | implementer-be | implementer
+- 文件列表：
+  - path/to/file-c
+  - path/to/file-d
 ```
 
 ## Rules

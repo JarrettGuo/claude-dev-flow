@@ -28,16 +28,25 @@ shift
 case "$EVENT_TYPE" in
   subagent-start)
     AGENT_NAME="${1:-unknown}"
-    LINE=$(printf "[%s] ▶ ENTER @%s" "$TIMESTAMP" "$AGENT_NAME")
+    AGENT_ID="${2:-}"
+    ID_PREFIX=""
+    [ -n "$AGENT_ID" ] && ID_PREFIX=" @${AGENT_ID}"
+    LINE=$(printf "[%s]%s ▶ ENTER @%s" "$TIMESTAMP" "$ID_PREFIX" "$AGENT_NAME")
     ;;
   subagent-stop)
     AGENT_NAME="${1:-unknown}"
     DURATION="${2:-}"
     [ -z "$DURATION" ] && DURATION=0
-    LINE=$(printf "[%s] ◀ EXIT @%s (%ss)" "$TIMESTAMP" "$AGENT_NAME" "$DURATION")
+    AGENT_ID="${3:-}"
+    ID_PREFIX=""
+    [ -n "$AGENT_ID" ] && ID_PREFIX=" @${AGENT_ID}"
+    LINE=$(printf "[%s]%s ◀ EXIT @%s (%ss)" "$TIMESTAMP" "$ID_PREFIX" "$AGENT_NAME" "$DURATION")
     ;;
   user-input)
     INPUT="${1:-}"
+    AGENT_ID="${2:-}"
+    ID_PREFIX=""
+    [ -n "$AGENT_ID" ] && ID_PREFIX=" @${AGENT_ID}"
     # 去掉首尾空白，但保留原字符
     INPUT_TRIMMED=$(echo "$INPUT" | awk '{$1=$1};1')
     # 用 awk 统计"字符数"（UTF-8 安全）而不是字节数
@@ -45,9 +54,9 @@ case "$EVENT_TYPE" in
 
     # 判断是短确认（≤ 6 字符，覆盖 y/yes/n/no/编辑/确认/跳过）还是长输入
     if [ "$CHAR_COUNT" -le 6 ]; then
-      LINE=$(printf "[%s] ✓ DECISION 用户输入: \"%s\"" "$TIMESTAMP" "$INPUT_TRIMMED")
+      LINE=$(printf "[%s]%s ✓ DECISION 用户输入: \"%s\"" "$TIMESTAMP" "$ID_PREFIX" "$INPUT_TRIMMED")
     else
-      LINE=$(printf "[%s] ✓ DECISION 用户发送新指令（%d 字符）" "$TIMESTAMP" "$CHAR_COUNT")
+      LINE=$(printf "[%s]%s ✓ DECISION 用户发送新指令（%d 字符）" "$TIMESTAMP" "$ID_PREFIX" "$CHAR_COUNT")
     fi
     ;;
   *)
