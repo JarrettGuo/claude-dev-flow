@@ -10,6 +10,21 @@ The user wants to build: $ARGUMENTS
 ## Workflow
 
 ### Phase 1: Analyze
+
+> 🚫 **严禁开场白**
+>
+> 进入 Phase 1 前后，**绝不输出任何过渡性散文**，包括但不限于：
+> - "Let me first understand..." / "I'll initialize the dev flow..."
+> - "我先了解一下当前代码状态..." / "让我初始化流程..."
+> - 在 flow-init.sh 跑完之后、调用 @analyst 之前的任何"总结性"陈述
+>
+> 如果需要工具调用来生成合理的 feature 名（如读 git diff、看相关文件），
+> **直接调用工具**，不要前置叙述。结果在你内心消化为 feature 名即可，
+> 不要打印出"我看到了 X、Y、Z，所以 feature 名是 ..."这种内容。
+>
+> 这与 `.claude/docs/output-style.md` 第 1.3 节"不要自述"一脉相承——
+> 流程入口同样适用。
+
 1. 生成 feature 名（kebab-case，2-4 词）
 2. 初始化 flow：
 ```bash
