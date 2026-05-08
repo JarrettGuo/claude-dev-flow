@@ -251,7 +251,7 @@ CHANGED=$( { git diff --name-only; git diff --name-only --cached; } | sort -u )
 | Agent A 中途失败 | 通知 Agent B 停止；等 B 返回；调用 `@debugger` 修复 A；仅重跑 A 单元 |
 | postcheck 越界 | rollback 越界文件，仅重调度越界单元 |
 | Reviewer 发现跨单元逻辑冲突 | Phase 4 `CHANGES_REQUESTED` 时回 Phase 3 顺序重做；FLOW.log 写 `⚠ WARN review 发现跨单元冲突，顺序重做` |
-| 并行超时（v1 不实现） | 用户手动中断后写 `⚠ WARN 用户中断并行，<单元名> 未完成` |
+| 并行超时 | 用户手动中断后写 `⚠ WARN 用户中断并行，<单元名> 未完成` |
 
 完成后进入 Phase 4：
 ```bash

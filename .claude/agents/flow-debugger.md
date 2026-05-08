@@ -102,9 +102,6 @@ Classify issues into three categories:
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
- FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
- if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
- LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
  TS=$(date +"%H:%M:%S")
  printf "[%s] ▶ PHASE /flow-debug 启动\n" "$TS" >> "$LOG"
  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
@@ -165,10 +162,11 @@ fi
  if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
  TS=$(date +"%H:%M:%S")
-   printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >> "$FLOW_LOG"
-   if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
-     printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >&2
-   fi
+ printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >> "$LOG"
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+ printf "[%s] ✓ DECISION 用户确认自动修复\n" "$TS" >&2
+ fi
+ fi
    ```
 
 2. **改代码**（用 Edit 工具）
@@ -182,10 +180,11 @@ fi
  if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
  TS=$(date +"%H:%M:%S")
-   printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >> "$FLOW_LOG"
-   if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
-     printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >&2
-   fi
+ printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >> "$LOG"
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+ printf "[%s] ✓ COMPLETE 修复成功，测试通过\n" "$TS" >&2
+ fi
+ fi
    ```
 
    告诉用户：
@@ -202,10 +201,11 @@ fi
  if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
  TS=$(date +"%H:%M:%S")
-   printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >> "$FLOW_LOG"
-   if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
-     printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >&2
-   fi
+ printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >> "$LOG"
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+ printf "[%s] ✗ ERROR 修复 2 轮后仍失败，已回滚\n" "$TS" >&2
+ fi
+ fi
    ```
 
 ### Step 7: 如果不修（用户选"n"或类别 A/C 没有可修项）
