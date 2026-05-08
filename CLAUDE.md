@@ -19,7 +19,7 @@ AI/Developer Tools — Claude Code 开发流程框架，规范多 agent 协作�
 |------|------|
 | `.claude/commands/` | slash command 实现（dev / fix / review / commit 等，共 9 个） |
 | `.claude/agents/` | 多 agent 协作角色定义（共 8 个） |
-| `.claude/skills/` | 可复用能力单元（共 8 个） |
+| `.claude/skills/` | 可复用能力单元（共 7 个） |
 | `.claude/docs/` | 框架规范文档 |
 | `.claude/hooks/` | Claude Code hooks（flow-log.sh） |
 | `.claude/settings.json` | Claude Code 项目级配置 |
@@ -91,6 +91,9 @@ claude-dev-flow/
 - 禁止魔法数字
 - 单函数 ≤ 50 行，参数 ≤ 5 个
 - if 嵌套 ≤ 4 层，for ≤ 3 层
+- 缩进：4 空格（shell / 配置文件统一）
+- 字符串：优先单引号，需变量插值时用双引号
+- 行尾：shell 不需要分号，JS/TS 按项目配置
 
 ### 框架特有规范
 - Command 和 Agent 必须遵守 `.claude/docs/framework-rules.md`

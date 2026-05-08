@@ -36,7 +36,6 @@ claude-dev-flow/
         ├── add-plugin-guide.md  # 插件开发指南
         └── plugins.config.md    # 当前启用的插件清单
 ```
-                                                                         ← 修改：补全 .claude/ 结构
 
 ## 命令速查
 
@@ -153,7 +152,6 @@ claude-dev-flow/
 ```
 
 输出符合团队 `<type>(<scope>): <subject>` 规范的 commit 建议。改动跨越多端或多模块时自动建议拆分。**不自动执行 `git commit`**。
-                                                                         ← 修改：补上 --split 用法（现有命令支持但原 README 漏了）
 
 ---
 

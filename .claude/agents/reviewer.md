@@ -68,9 +68,9 @@ Find violations of the team code standards. Be specific. Cite file:line.
 
 **代码风格**
 
-- [ ] 4 空格缩进,无 tab
-- [ ] 单引号字符串
-- [ ] 分号结尾
+- [ ] 缩进风格与 CLAUDE.md 声明一致（未声明则跳过此检查）
+- [ ] 引号风格与 CLAUDE.md 声明一致（未声明则跳过此检查）
+- [ ] 行尾分号使用与 CLAUDE.md 声明一致（未声明则跳过此检查）
 - [ ] if/for/while 大括号悬挂式、必须包裹
 - [ ] **无魔法数字**(数字必须赋给常量)
 - [ ] 单文件 ≤ 2000 行

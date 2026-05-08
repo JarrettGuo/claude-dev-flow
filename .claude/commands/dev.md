@@ -158,12 +158,12 @@ BASELINE_COMMIT=$(git rev-parse HEAD)
 PARALLEL_START=$(date +%s)
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
-  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
-  TS=$(date +"%H:%M:%S")
-  printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >&2
+    fi
 fi
 ```
 
@@ -190,12 +190,12 @@ UNIT1_END=$(date +%s)
 UNIT1_ELAPSED=$((UNIT1_END - PARALLEL_START))
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
-  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
-  TS=$(date +"%H:%M:%S")
-  printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >&2
+    fi
 fi
 ```
 
@@ -205,12 +205,12 @@ UNIT2_END=$(date +%s)
 UNIT2_ELAPSED=$((UNIT2_END - PARALLEL_START))
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
-  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
-  TS=$(date +"%H:%M:%S")
-  printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >&2
+    fi
 fi
 ```
 
@@ -219,12 +219,12 @@ fi
 TOTAL_ELAPSED=$(( $(date +%s) - PARALLEL_START ))
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
-  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
-  TS=$(date +"%H:%M:%S")
-  printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >&2
+    fi
 fi
 ```
 
@@ -267,12 +267,12 @@ bash .claude/hooks/phase-complete.sh 4
 # commit 分组检测（保留内联逻辑）
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
- LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
- TS=$(date +"%H:%M:%S")
- printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >&2
+    fi
 fi
 # SUGGEST_SPLIT 检测逻辑...
 ```

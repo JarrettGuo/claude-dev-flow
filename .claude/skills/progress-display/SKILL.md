@@ -101,23 +101,6 @@ progress_phase_complete 1 150
 # 参数：当前阶段序号 耗时(秒)
 ```
 
-### progress_agent_start
-
-报告 agent 开始执行。
-
-```bash
-progress_agent_start "@analyst" "分析需求"
-```
-
-### progress_agent_complete
-
-报告 agent 完成。
-
-```bash
-progress_agent_complete "@analyst" "分析需求" 150
-# 参数：agent名 描述 耗时(秒)
-```
-
 ## 时间估算逻辑
 
 基于已完成阶段的平均耗时估算剩余时间：
@@ -180,13 +163,6 @@ progress_init "/dev" 6
 
 # 阶段开始
 progress_phase_start "Phase 1" 1 6 "analyst"
-
-# Agent 开始
-progress_agent_start "@analyst" "分析需求"
-
-# Agent 完成
-sleep 30
-progress_agent_complete "@analyst" "分析需求" 30
 
 # 阶段完成
 progress_phase_complete 1 45

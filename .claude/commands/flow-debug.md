@@ -22,16 +22,16 @@ FEATURE=$(echo "$ARGUMENTS" | awk '{print $1}')
 
 # 先找 specs
 if [ -d ".dev-flow/specs/${FEATURE}" ]; then
-  TARGET=".dev-flow/specs/${FEATURE}"
+    TARGET=".dev-flow/specs/${FEATURE}"
 elif [ -d ".dev-flow/fixes/${FEATURE}" ]; then
-  TARGET=".dev-flow/fixes/${FEATURE}"
+    TARGET=".dev-flow/fixes/${FEATURE}"
 else
-  echo "❌ 找不到 ${FEATURE} 对应的流程目录"
-  echo ""
-  echo "已知的流程："
-  ls .dev-flow/specs/ 2>/dev/null | sed 's|^|  specs/|'
-  ls .dev-flow/fixes/ 2>/dev/null | sed 's|^|  fixes/|'
-  exit 1
+    echo "❌ 找不到 ${FEATURE} 对应的流程目录"
+    echo ""
+    echo "已知的流程："
+    ls .dev-flow/specs/ 2>/dev/null | sed 's|^|  specs/|'
+    ls .dev-flow/fixes/ 2>/dev/null | sed 's|^|  fixes/|'
+    exit 1
 fi
 
 echo "找到: ${TARGET}"

@@ -48,9 +48,9 @@ case "$EVENT_TYPE" in
     ID_PREFIX=""
     [ -n "$AGENT_ID" ] && ID_PREFIX=" @${AGENT_ID}"
     # 去掉首尾空白，但保留原字符
-    INPUT_TRIMMED=$(echo "$INPUT" | awk '{$1=$1};1')
-    # 用 awk 统计"字符数"（UTF-8 安全）而不是字节数
-    CHAR_COUNT=$(printf "%s" "$INPUT_TRIMMED" | awk '{print length}')
+    INPUT_TRIMMED=$(printf "%s" "$INPUT" | awk '{$1=$1};1')
+    # 用 wc -m 统计字符数（POSIX，真正 UTF-8 安全）
+    CHAR_COUNT=$(printf "%s" "$INPUT_TRIMMED" | wc -m | tr -d ' ')
 
     # 判断是短确认（≤ 6 字符，覆盖 y/yes/n/no/编辑/确认/跳过）还是长输入
     if [ "$CHAR_COUNT" -le 6 ]; then

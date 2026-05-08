@@ -149,12 +149,12 @@ Handle:
 bash .claude/hooks/phase-complete.sh 6
 FEATURE_PATH=$(cat .dev-flow/.current-flow 2>/dev/null || echo "")
 if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
- LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
- TS=$(date +"%H:%M:%S")
- printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
-  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
- printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >&2
-  fi
+    LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
+    TS=$(date +"%H:%M:%S")
+    printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
+    if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+        printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >&2
+    fi
 fi
 ```
 进入 Phase 7
