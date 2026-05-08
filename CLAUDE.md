@@ -67,8 +67,7 @@ claude-dev-flow/
 │   │   ├── read-requirement/  # 需求读取
 │   │   ├── search-codebase/   # 代码搜索
 │   │   ├── fetch-error-context/ # 错误上下文
-│   │   ├── commit-split/      # commit 拆分
-│   │   └── remove-skill/      # 技能移除
+│   │   └── commit-split/      # commit 拆分
 │   ├── settings.json      # Claude Code 配置
 │   ├── mcp.json          # MCP 服务器和 agent 定义
 │   └── .version          # 框架版本

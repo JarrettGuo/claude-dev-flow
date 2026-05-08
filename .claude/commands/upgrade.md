@@ -94,9 +94,9 @@ fi
 
 git clone --quiet "$SOURCE_URL" "$TMPDIR" || {
  printf "[%s] ✗ ERROR 拉取失败\n" "$(date +%H:%M:%S)" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ✗ ERROR 拉取失败\n" "$(date +%H:%M:%S)" >&2
- fi
+  fi
  exit 1
 }
 
@@ -116,9 +116,9 @@ fi
 if [ "$LOCAL_VERSION" = "$REMOTE_SHA" ]; then
  echo "✓ 已经是最新版本 ($REMOTE_SHORT)，无需升级"
  printf "[%s] ✓ COMPLETE 已是最新\n" "$(date +%H:%M:%S)" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ✓ COMPLETE 已是最新\n" "$(date +%H:%M:%S)" >&2
- fi
+  fi
  rm -f .dev-flow/.current-flow
  exit 0
 fi
@@ -136,15 +136,15 @@ if [ -n "$LOCAL_VERSION" ]; then
  if (cd "$TMPDIR" && git cat-file -e "$LOCAL_VERSION" 2>/dev/null); then
  HAS_BASE="true"
  printf "[%s] ∙ ACTION 使用 %s 作为对比基线\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ∙ ACTION 使用 %s 作为对比基线\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >&2
- fi
+  fi
  else
  printf "[%s] ⚠ WARN 本地版本 %s 在远端历史中找不到（可能是 force push 或手动改过版本号）\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ⚠ WARN 本地版本 %s 在远端历史中找不到（可能是 force push 或手动改过版本号）\n" "$(date +%H:%M:%S)" "${LOCAL_VERSION:0:7}" >&2
- fi
- fi
+  fi
+  fi
 fi
 ```
 
@@ -177,7 +177,7 @@ for f in $REMOTE_FILES; do
  if [ ! -f "$f" ]; then
  NEW_FILES+=("$f")
  continue
- fi
+  fi
 
  LOCAL_HASH=$(git hash-object "$f" 2>/dev/null || echo "ERROR")
  [ "$LOCAL_HASH" = "ERROR" ] && { echo "❌ 无法计算 hash: $f" >&2; exit 1; }
@@ -185,7 +185,7 @@ for f in $REMOTE_FILES; do
  if [ "$LOCAL_HASH" = "$REMOTE_HASH" ]; then
  UNCHANGED+=("$f")
  continue
- fi
+  fi
 
  # 本地 ≠ 远端，需要判断用户是否改过
  if [ "$HAS_BASE" = "true" ]; then
@@ -197,11 +197,11 @@ for f in $REMOTE_FILES; do
  SAFE_OVERWRITE+=("$f")
  else
  CONFLICTS+=("$f")
- fi
+  fi
  else
  # 没有基线，保守起见全部列为潜在冲突
  CONFLICTS+=("$f")
- fi
+  fi
 done
 ```
 
@@ -303,7 +303,7 @@ if [ -f ".claude/settings.json" ] && [ -f "$TMPDIR/.claude/settings.json" ]; the
  jq -s '.[1] * .[0]' \
  .claude/settings.json "$TMPDIR/.claude/settings.json" \
  > .claude/settings.json.tmp && mv .claude/settings.json.tmp .claude/settings.json
- fi
+  fi
 fi
 
 # 智能合并 .gitignore（仅当用户选 --with-readme 或框架 .gitignore 有变化时）
