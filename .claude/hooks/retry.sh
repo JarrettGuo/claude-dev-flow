@@ -5,7 +5,7 @@
 # 示例:
 #   bash .claude/hooks/retry.sh 1 3
 #   bash .claude/hooks/retry.sh 2
-
+set -eu
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 [ -f "$CURRENT_FLOW_FILE" ] || exit 0
 

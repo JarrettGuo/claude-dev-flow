@@ -68,10 +68,6 @@ LINE2=$(printf "[%s] ∙ INPUT %s\n" "$TS" "$INPUT_SUMMARY")
 
 echo "$LINE1" >> "$LOG_FILE"
 echo "$LINE2" >> "$LOG_FILE"
-if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
-  echo "$LINE1" >&2
-  echo "$LINE2" >&2
-fi
 
 # 写 Phase 1 分隔符和启动
 {

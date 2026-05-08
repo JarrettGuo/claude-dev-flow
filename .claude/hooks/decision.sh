@@ -4,7 +4,7 @@
 #
 # 示例:
 #   bash .claude/hooks/decision.sh "用户确认需求 → 进入 Phase 2" 2 "Design" "architect" 6
-
+set -eu
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 [ -f "$CURRENT_FLOW_FILE" ] || exit 0
 

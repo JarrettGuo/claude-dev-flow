@@ -4,7 +4,7 @@
 #
 # 示例:
 #   bash .claude/hooks/flow-footer.sh 6
-
+set -eu
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 [ -f "$CURRENT_FLOW_FILE" ] || exit 0
 
@@ -52,4 +52,6 @@ cat >> "$LOG_FILE" <<EOF
 ═══════════════════════════════════════════════════════════
 EOF
 
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "Flow completed. See .dev-flow/${FEATURE}/" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "Flow completed. See .dev-flow/${FEATURE}/" >&2
+fi

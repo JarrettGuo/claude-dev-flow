@@ -114,8 +114,8 @@ gen_progress_panel() {
 
   # 估算剩余时间
   local remaining=""
-  if [ "$PROGRESS_SHOW_TIME" = true ] && [ -n "$COMPLETED_PHASES" ] && [ "$COMPLETED_PHASES" -gt 0 ]; then
-    local avg_sec=$((TOTAL_ELAPSED_SEC / COMPLETED_PHASES))
+  if [ "$PROGRESS_SHOW_TIME" = true ] && [ -n "$PROGRESS_COMPLETED_PHASES" ] && [ "$PROGRESS_COMPLETED_PHASES" -gt 0 ]; then
+    local avg_sec=$((PROGRESS_TOTAL_ELAPSED_SEC / PROGRESS_COMPLETED_PHASES))
     local remaining_phases=$((total_phases - phase))
     local est_sec=$((avg_sec * remaining_phases))
     local est_min=$((est_sec / 60))
@@ -156,7 +156,7 @@ gen_progress_panel() {
   [ -n "$agents_lines" ] && panel+="$agents_lines"
   panel+="$(printf '%*s\n' "$max_width" '' | tr ' ' '-')\n"
 
-  echo -e "$panel"
+  printf '%b\n' "$panel"
 }
 
 # ═══════════════════════════════════════════════════════════
@@ -194,13 +194,13 @@ progress_display() {
 
   case "$PROGRESS_STYLE" in
     simple)
-      echo -e "$(gen_simple_update "$phase" "$total_phases" "$current_agent" "$pct" "$remaining")"
+      printf '%b\n' "$(gen_simple_update "$phase" "$total_phases" "$current_agent" "$pct" "$remaining")"
       ;;
     minimal)
       echo "## $pct% @${current_agent}"
       ;;
     full|*)
-      echo -e "$(gen_progress_panel "$cmd_name" "$phase" "$total_phases" "$current_agent" "$agent_status" "$elapsed_sec" "$pct")"
+      printf '%b\n' "$(gen_progress_panel "$cmd_name" "$phase" "$total_phases" "$current_agent" "$agent_status" "$elapsed_sec" "$pct")"
       ;;
   esac
 }

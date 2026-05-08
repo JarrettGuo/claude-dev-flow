@@ -16,7 +16,7 @@
 #
 # 示例:
 #   bash .claude/hooks/gate-wait.sh "用户确认需求"
-
+set -eu
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 [ -f "$CURRENT_FLOW_FILE" ] || exit 0
 

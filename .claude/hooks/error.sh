@@ -4,7 +4,7 @@
 #
 # 示例:
 #   bash .claude/hooks/error.sh "Review 被阻止，invoke debugger"
-
+set -eu
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 [ -f "$CURRENT_FLOW_FILE" ] || exit 0
 
