@@ -9,12 +9,10 @@ description: Write concise progress entries to the current flow's log file, AND 
 
 **双通道**：同一行内容**同时**写入磁盘文件 + 输出到终端。
 
-三级降级（向后兼容）：
 | 变量 | 行为 |
 |------|------|
 | `FLOW_LOG_QUIET=1` | 仅写文件，静默终端 |
-| `FLOW_LOG_STDERR=1` | 输出终端（deprecated，语义不直观） |
-| 默认 | 输出终端（新默认行为） |
+| 默认（不设置） | 写文件 + 输出终端 |
 
 用户开一个 Claude Code 会话就能实时看到进度，不用额外开终端 `tail -f`。
 
@@ -126,7 +124,7 @@ description: Write concise progress entries to the current flow's log file, AND 
 
 所有写入日志的操作**必须**遵循：
 
-1. **双通道输出：默认输出终端，FLOW_LOG_QUIET=1 时静默，FLOW_LOG_STDERR=1 仍兼容**
+1. **双通道输出：默认写文件 + 输出终端；FLOW_LOG_QUIET=1 时仅写文件，静默终端**
 
 ```bash
 LOG_FILE=".dev-flow/specs/${FEATURE}/FLOW.log"
@@ -135,8 +133,8 @@ LINE="[${TIMESTAMP}] ▶ ENTER @analyst"
 
 # 写文件（始终）
 echo "$LINE" >> "$LOG_FILE"
-# 终端输出（FLOW_LOG_QUIET=1 时静默；FLOW_LOG_STDERR=1 仍兼容）
-if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+# 终端输出（FLOW_LOG_QUIET=1 时静默）
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
   echo "$LINE" >&2
 fi
 ```

@@ -20,4 +20,6 @@ ERROR_DESC="${1:-未知错误}"
 LINE=$(printf "[%s] ✗ ERROR %s\n" "$TS" "$ERROR_DESC")
 
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE" >&2
+fi

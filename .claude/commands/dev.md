@@ -161,7 +161,7 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
   TS=$(date +"%H:%M:%S")
   printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ∙ ACTION 并行启动 2 个单元: <单元1名>, <单元2名>\n" "$TS" >&2
  fi
 fi
@@ -193,7 +193,7 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
   TS=$(date +"%H:%M:%S")
   printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ∙ ACTION 单元 <单元1名> 完成 (%ss)\n" "$TS" "$UNIT1_ELAPSED" >&2
  fi
 fi
@@ -208,7 +208,7 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
   TS=$(date +"%H:%M:%S")
   printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ∙ ACTION 单元 <单元2名> 完成 (%ss)\n" "$TS" "$UNIT2_ELAPSED" >&2
  fi
 fi
@@ -222,7 +222,7 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
   LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
   TS=$(date +"%H:%M:%S")
   printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ∙ ACTION 所有并行单元完成，总耗时 %ss\n" "$TS" "$TOTAL_ELAPSED" >&2
  fi
 fi
@@ -270,7 +270,7 @@ if [ -n "$FEATURE_PATH" ] && [ -f ".dev-flow/${FEATURE_PATH}/FLOW.log" ]; then
  LOG=".dev-flow/${FEATURE_PATH}/FLOW.log"
  TS=$(date +"%H:%M:%S")
  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >> "$LOG"
- if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+ if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
  printf "[%s] ✓ COMPLETE Review 通过\n" "$TS" >&2
  fi
 fi

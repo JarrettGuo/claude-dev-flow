@@ -33,7 +33,9 @@ fi
 COMMAND_NAME=$(echo "$FEATURE" | cut -d'/' -f1 | sed 's/specs/dev/;s/fixes/fix/')
 LINE=$(printf "[%s] ✓ COMPLETE /%s 流程完成\n" "$TS" "$COMMAND_NAME")
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE" >&2
+fi
 
 # 清理临时状态
 rm -f .dev-flow/.phase-start

@@ -47,7 +47,7 @@ progress_bar() {
  local filled=$((percent * width / 100))
  local empty=$((width - filled))
 
- # Emoji-free ASCII 版本（兼容性优先）
+ # ASCII 版本（避免终端 emoji 渲染不一致）
  local bar=$(printf "%${filled}s" | tr ' ' '#')
  bar+=$(printf "%${empty}s" | tr ' ' '-')
 

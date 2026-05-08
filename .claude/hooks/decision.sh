@@ -34,7 +34,9 @@ fi
 # 写 DECISION 事件
 LINE=$(printf "[%s] ✓ DECISION %s\n" "$TS" "$DECISION")
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE" >&2
+fi
 
 # 完成当前 phase 并启动下一个
 bash .claude/hooks/phase-complete.sh "$CURRENT_PHASE" "$NEXT_PHASE_NUM" "$NEXT_PHASE_NAME" "$NEXT_AGENT" "$NEXT_TOTAL"

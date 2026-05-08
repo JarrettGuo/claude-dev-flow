@@ -37,8 +37,7 @@ if [ -f "$CURRENT_FLOW_FILE" ]; then
 fi
 
 # flow 类型由 FLOW_TYPE_OVERRIDE 环境变量控制
-# /dev 不传 → 默认 specs（向后兼容）
-# /fix 传 FLOW_TYPE_OVERRIDE=fixes → 写到 fixes/
+# /dev 不传 → 默认 specs；/fix 传 FLOW_TYPE_OVERRIDE=fixes → 写到 fixes/
 FLOW_TYPE="${FLOW_TYPE_OVERRIDE:-specs}"
 
 # 合法性检查：只接受 specs 或 fixes
@@ -75,7 +74,10 @@ LINE2=$(printf "[%s] ∙ INPUT %s\n" "$TS" "$INPUT_SUMMARY")
 
 echo "$LINE1" >> "$LOG_FILE"
 echo "$LINE2" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE1" && echo "$LINE2" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE1" >&2
+  echo "$LINE2" >&2
+fi
 
 # 写 Phase 1 分隔符和启动
 {

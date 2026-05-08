@@ -32,4 +32,6 @@ DESC="${1:-等待确认}"
 LINE=$(printf "[%s] ⏸ GATE %s\n" "$TS" "$DESC")
 
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE" >&2
+fi

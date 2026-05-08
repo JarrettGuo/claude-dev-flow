@@ -97,7 +97,7 @@ claude-dev-flow/
 - Command 和 Agent 必须遵守 `.claude/docs/framework-rules.md`
 - 终端输出必须遵守 `.claude/docs/output-style.md`
 - 所有技术栈假设从 `CLAUDE.md` 读取，不得硬编码
-- FLOW.log 默认只写文件不输出到终端；设置 `FLOW_LOG_STDERR=1` 可开启终端输出
+- FLOW.log 默认写文件 + 输出终端；设置 `FLOW_LOG_QUIET=1` 可静默终端
 
 ## Git 规范
 
@@ -153,8 +153,8 @@ docs(docs): 补充 framework-rules.md 的栈外执行约束
 - 添加新 MCP 用 `/add-skill`，不要手动修改 mcp.json
 
 ### 日志记录规范
-- 默认 `>> "$LOG"` 只写文件
-- `FLOW_LOG_STDERR=1` 环境变量开启终端输出
+- 默认 `>> "$LOG"` 写文件 + 输出终端
+- `FLOW_LOG_QUIET=1` 环境变量静默终端输出（仅写文件）
 - 所有 agent 和 command 必须遵守 `flow-log` skill 的写入模式
 
 ## 不要碰的模块

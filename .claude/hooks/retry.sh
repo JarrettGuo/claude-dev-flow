@@ -23,4 +23,6 @@ TS=$(date +"%H:%M:%S")
 LINE=$(printf "[%s] ↻ RETRY 第 %s 轮/共%s轮\n" "$TS" "$ROUND" "$MAX")
 
 echo "$LINE" >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && echo "$LINE" >&2
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  echo "$LINE" >&2
+fi

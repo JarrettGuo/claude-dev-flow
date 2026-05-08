@@ -64,8 +64,8 @@ case "$EVENT_TYPE" in
     ;;
 esac
 
-# 双通道输出：默认输出终端；FLOW_LOG_QUIET=1 时静默；FLOW_LOG_STDERR=1 仍兼容
+# 双通道输出：默认写文件 + 输出终端；FLOW_LOG_QUIET=1 时仅写文件
 echo "$LINE" >> "$LOG_FILE"
-if [ "${FLOW_LOG_QUIET:-0}" != "1" ] || [ "${FLOW_LOG_STDERR:-0}" = "1" ]; then
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
   echo "$LINE" >&2
 fi

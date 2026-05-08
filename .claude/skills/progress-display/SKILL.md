@@ -167,7 +167,7 @@ fi
 进度显示**不写入** FLOW.log，只输出到终端。
 FLOW.log 保持完整的文本日志，供 `/flow-debug` 解析。
 
-进度显示函数默认只输出到终端，不写入 FLOW.log。若需同时输出到 FLOW.log，可配合 `FLOW_LOG_STDERR=1` 环境变量。
+进度显示函数默认只输出到终端，不写入 FLOW.log。FLOW.log 的终端回显由 `FLOW_LOG_QUIET` 控制，与本模块无关。
 
 ## 使用示例
 
