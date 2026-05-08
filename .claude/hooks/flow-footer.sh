@@ -41,6 +41,7 @@ fi
 rm -f .dev-flow/.phase-start
 rm -f .dev-flow/.current-phase
 rm -f .dev-flow/.current-flow
+rm -f .dev-flow/.progress-cmd .dev-flow/.progress-total .dev-flow/.progress-start-time .dev-flow/.progress-completed .dev-flow/.progress-elapsed
 
 # 写 footer
 cat >> "$LOG_FILE" <<EOF

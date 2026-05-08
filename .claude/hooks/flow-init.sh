@@ -78,10 +78,6 @@ fi
   printf "\n─── Phase %s: %s ──────────────────────────────────────\n" "$PHASE_NUM" "$PHASE_NAME"
   printf "[%s] ▶ PHASE Phase %s 启动\n" "$TS" "$PHASE_NUM"
 } >> "$LOG_FILE"
-[ "${FLOW_LOG_QUIET:-0}" != "1" ] && {
-  printf "\n─── Phase %s: %s ──────────────────────────────────────\n" "$PHASE_NUM" "$PHASE_NAME" >&2
-  printf "[%s] ▶ PHASE Phase %s 启动\n" "$TS" "$PHASE_NUM" >&2
-}
 
 # 启动 progress
 if source .claude/skills/progress-display/progress.bash 2>/dev/null; then
