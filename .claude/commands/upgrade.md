@@ -171,14 +171,16 @@ CONFLICTS=()
 UNCHANGED=() # 本地 hash = 远端 hash，啥也不用做
 
 for f in $REMOTE_FILES; do
- REMOTE_HASH=$(cd "$TMPDIR" && git hash-object "$f")
+ REMOTE_HASH=$(cd "$TMPDIR" && git hash-object "$f" 2>/dev/null || echo "ERROR")
+ [ "$REMOTE_HASH" = "ERROR" ] && { echo "❌ 无法计算远端 hash: $f" >&2; exit 1; }
 
  if [ ! -f "$f" ]; then
  NEW_FILES+=("$f")
  continue
  fi
 
- LOCAL_HASH=$(git hash-object "$f" 2>/dev/null || sha256sum "$f" | awk '{print $1}')
+ LOCAL_HASH=$(git hash-object "$f" 2>/dev/null || echo "ERROR")
+ [ "$LOCAL_HASH" = "ERROR" ] && { echo "❌ 无法计算 hash: $f" >&2; exit 1; }
 
  if [ "$LOCAL_HASH" = "$REMOTE_HASH" ]; then
  UNCHANGED+=("$f")
@@ -295,10 +297,13 @@ done
 
 # 智能合并 settings.json
 if [ -f ".claude/settings.json" ] && [ -f "$TMPDIR/.claude/settings.json" ]; then
- # 用 jq 合并: 用户键 + 远端 hooks（hooks 以远端为准）
- jq -s '.[0] * {hooks: .[1].hooks}' \
+ if ! command -v jq &>/dev/null; then
+ echo "⚠️ jq 未安装，跳过 settings.json 合并，请手动合并" >&2
+ else
+ jq -s '.[1] * .[0]' \
  .claude/settings.json "$TMPDIR/.claude/settings.json" \
  > .claude/settings.json.tmp && mv .claude/settings.json.tmp .claude/settings.json
+ fi
 fi
 
 # 智能合并 .gitignore（仅当用户选 --with-readme 或框架 .gitignore 有变化时）

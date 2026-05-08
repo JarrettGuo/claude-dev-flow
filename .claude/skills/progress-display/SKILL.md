@@ -89,7 +89,7 @@ progress_bar 65 10
 报告阶段开始。
 
 ```bash
-progress_phase_start "Phase 1" "Analyze" 1 6
+progress_phase_start "Phase 1" 1 6 "analyst"
 ```
 
 ### progress_phase_complete
@@ -97,8 +97,8 @@ progress_phase_start "Phase 1" "Analyze" 1 6
 报告阶段完成。
 
 ```bash
-progress_phase_complete "Phase 1" "Analyze" 150
-# 参数：阶段名 阶段描述 耗时(秒)
+progress_phase_complete 1 150
+# 参数：当前阶段序号 耗时(秒)
 ```
 
 ### progress_agent_start
@@ -179,7 +179,7 @@ source ~/.claude/skills/progress-display/progress.bash
 progress_init "/dev" 6
 
 # 阶段开始
-progress_phase_start "Phase 1" "Analyze" 1 6
+progress_phase_start "Phase 1" 1 6 "analyst"
 
 # Agent 开始
 progress_agent_start "@analyst" "分析需求"
@@ -189,7 +189,7 @@ sleep 30
 progress_agent_complete "@analyst" "分析需求" 30
 
 # 阶段完成
-progress_phase_complete "Phase 1" "Analyze" 45
+progress_phase_complete 1 45
 ```
 
 ## 与 flow-log.sh 的集成点

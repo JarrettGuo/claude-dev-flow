@@ -23,7 +23,7 @@ AI/Developer Tools — Claude Code 开发流程框架，规范多 agent 协作�
 | `.claude/docs/` | 框架规范文档 |
 | `.claude/hooks/` | Claude Code hooks（flow-log.sh） |
 | `.claude/settings.json` | Claude Code 项目级配置 |
-| `.claude/mcp.json` | MCP 服务器和 agent 角色定义 |
+| `.claude/mcp.json` | MCP 服务器配置（预留，当前为空） |
 | `.claude/.version` | 框架版本号 |
 
 ### 依赖管理
@@ -148,8 +148,8 @@ docs(docs): 补充 framework-rules.md 的栈外执行约束
 - `.dev-flow/.current-flow` 文件标记当前 flow，流程结束后删除
 
 ### MCP 配置
-- MCP 服务器定义在 `.claude/mcp.json`
-- Agent 角色定义在 `.claude/mcp.json` 的 agents 字段
+- MCP 服务器定义在 `.claude/mcp.json`（当前为空，无激活的 MCP server）
+- Agent 角色定义在 `.claude/agents/*.md`，由 Claude Code 直接加载
 - 添加新 MCP 用 `/add-skill`，不要手动修改 mcp.json
 
 ### 日志记录规范

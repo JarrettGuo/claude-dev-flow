@@ -52,21 +52,15 @@ echo "$FEATURE" > "$CURRENT_FLOW_FILE"
 
 LOG_FILE=".dev-flow/${FEATURE}/FLOW.log"
 
-cat > "$LOG_FILE" <<'EOF'
+cat > "$LOG_FILE" <<EOF
 ═══════════════════════════════════════════════════════════
- FLOW LOG: FEATURE_PLACEHOLDER
- Command: COMMAND_PLACEHOLDER
- Started: TIMESTAMP_PLACEHOLDER
- Project: PWD_PLACEHOLDER
+ FLOW LOG: ${FEATURE_NAME}
+ Command: ${COMMAND}
+ Started: $(date +'%Y-%m-%d %H:%M:%S')
+ Project: $(pwd)
 ═══════════════════════════════════════════════════════════
 
 EOF
-
-# BSD sed 兼容替换
-sed -i '' "s|FEATURE_PLACEHOLDER|${FEATURE_NAME}|g" "$LOG_FILE"
-sed -i '' "s|COMMAND_PLACEHOLDER|${COMMAND}|g" "$LOG_FILE"
-sed -i '' "s|TIMESTAMP_PLACEHOLDER|$(date +'%Y-%m-%d %H:%M:%S')|" "$LOG_FILE"
-sed -i '' "s|PWD_PLACEHOLDER|$(pwd)|g" "$LOG_FILE"
 
 TS=$(date +"%H:%M:%S")
 LINE1=$(printf "[%s] ▶ START %s 启动\n" "$TS" "$COMMAND")

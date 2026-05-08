@@ -238,19 +238,3 @@ progress_phase_start() {
 
  progress_display "$PROGRESS_CMD_NAME" "$phase_num" "$total" "$agent" "" "$elapsed" "$pct"
 }
-
-progress_phase_done() {
- local phase_num=$1
- local elapsed_sec=$2
-
- progress_phase_complete "$phase_num" "$elapsed_sec"
-}
-
-progress_agent_done() {
- local agent=$1
- local elapsed_sec=$2
-
- # 这个函数只是记录，不做显示
- # 显示由 progress_phase_start 在下一阶段时更新
- :
-}
