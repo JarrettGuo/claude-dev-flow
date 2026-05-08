@@ -18,21 +18,29 @@ TOTAL="$7"
 CURRENT_FLOW_FILE=".dev-flow/.current-flow"
 
 # 检测异常中断
+# 参考 gate-wait.sh 范式：脚本只做检测和信号输出，真正的"等待用户决策"
+# 由调用方的 LLM prompt 层负责（见 dev.md / fix.md 的 STOP 块）。
+# Claude Code 的 Bash tool 以子进程执行，stdin 不连用户终端，
+# 任何 read 调用会立即得到 EOF，因此这里绝不使用 read。
 if [ -f "$CURRENT_FLOW_FILE" ]; then
   PREV_FLOW=$(cat "$CURRENT_FLOW_FILE")
   PREV_LOG=".dev-flow/${PREV_FLOW}/FLOW.log"
   if [ -f "$PREV_LOG" ] && ! grep -q "COMPLETED:" "$PREV_LOG"; then
-    echo "检测到异常中断的上一次 flow: $PREV_FLOW"
-    echo "[c] 清理旧状态，开始新 flow"
-    echo "[q] 退出手动处理"
-    echo "[r] 建议跑 /flow-debug 复盘"
-    read -p "选择: " choice
-    case "$choice" in
-      c) rm -f .dev-flow/.current-flow .dev-flow/.current-phase .dev-flow/.phase-start ;;
-      q) exit 1 ;;
-      r) echo "请运行: /flow-debug ${PREV_FLOW#specs/}" && exit 1 ;;
-      *) echo "无效选择" && exit 1 ;;
-    esac
+    if [ "${FLOW_INIT_FORCE:-0}" = "1" ]; then
+      # 强制模式：清理旧状态，继续创建新 flow
+      rm -f .dev-flow/.current-flow .dev-flow/.current-phase .dev-flow/.phase-start
+    else
+      FLOW_NAME="${PREV_FLOW#specs/}"
+      FLOW_NAME="${FLOW_NAME#fixes/}"
+      echo "DETECTED_ABANDONED_FLOW: ${PREV_FLOW}" >&2
+      echo "上一次 flow（${FLOW_NAME}）异常中断，FLOW.log 中无 COMPLETED: 标记。" >&2
+      echo "" >&2
+      echo "如何处理：" >&2
+      echo "  [清理] 设置 FLOW_INIT_FORCE=1 重新调用本脚本，丢弃旧状态开始新 flow" >&2
+      echo "  [退出] 不做任何操作，手动检查 .dev-flow/${PREV_FLOW}/ 后再决定" >&2
+      echo "  [复盘] 运行 /flow-debug ${FLOW_NAME}，复完盘后再回来" >&2
+      exit 2
+    fi
   fi
 fi
 

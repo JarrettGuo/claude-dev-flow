@@ -13,11 +13,27 @@ User's bug report: $ARGUMENTS
 1. 生成 bug 名（kebab-case，2-4 词）
 2. 初始化 flow：
 ```bash
-FEATURE="fixes/<bug-name>"
-mkdir -p ".dev-flow/${FEATURE}"
-echo "$FEATURE" > ".dev-flow/.current-flow"
 FLOW_TYPE_OVERRIDE=fixes bash .claude/hooks/flow-init.sh "<bug-name>" "/fix" "<摘要>" 1 "Analyze" "bug-analyst" 7
 ```
+
+> 🛑 **STOP — flow-init.sh 检测到异常中断**
+>
+> 如果上一步 bash 的退出码为 **2**，说明 stderr 中报告了 `DETECTED_ABANDONED_FLOW:`。
+> 此时 **绝不能** 继续往下走（不可调用 bug-analyst、不可写 .current-flow）。
+>
+> **你（orchestrator）此刻要做的事：**
+> 1. 把 stderr 中 `DETECTED_ABANDONED_FLOW:` 及后续提示**原文展示给用户**
+> 2. 向用户提问："上一次 flow 异常中断，如何处理？（清理 / 退出 / 复盘）"
+> 3. **结束本轮 turn**，不要执行任何后续工具调用
+> 4. 等待用户的下一条消息
+>
+> 用户回复处理：
+> - "清理" / "继续" / "force" → 设置 `FLOW_INIT_FORCE=1` 重新调用 flow-init.sh（同款参数），然后继续 Phase 1
+> - "退出" / "n" / "取消" → 终止流程，不做任何操作
+> - "复盘" / "debug" → 运行 `/flow-debug <异常flow名>`，等用户处理完后再回来
+>
+> 退出码为 0 时正常继续。
+
 3. invoke `@bug-analyst`
 4. 等待确认：
 ```bash
