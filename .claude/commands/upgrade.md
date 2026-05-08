@@ -405,4 +405,3 @@ rm -f .dev-flow/.current-flow
 - 用户中途取消（Ctrl+C）：清理临时目录，保证本地状态不变
 - jq 未安装：降级为"不智能合并 settings.json"，仅覆盖 hooks 部分并提醒用户
 
-```

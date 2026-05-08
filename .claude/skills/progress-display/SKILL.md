@@ -173,7 +173,7 @@ FLOW.log 保持完整的文本日志，供 `/flow-debug` 解析。
 
 ```bash
 # 在 dev.md 的 phase 切换处调用
-source ~/.claude/skills/progress-display/progress.bash
+source .claude/skills/progress-display/progress.bash
 
 # 初始化进度状态
 progress_init "/dev" 6
