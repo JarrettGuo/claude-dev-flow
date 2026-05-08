@@ -90,12 +90,7 @@ echo "$LINE2" >> "$LOG_FILE"
 # 记录 phase 起始时间（供 phase-complete 计算耗时用）
 date +%s > .dev-flow/.phase-start
 
-# 简洁终端提示（带视觉分隔符，只在终端显示，不污染 FLOW.log）
+# 简洁终端提示(单行紧凑 banner,只在终端显示,不污染 FLOW.log)
 if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
-  {
-    printf "\n"
-    printf "════════════════════════════════════════\n"
-    printf "▶ Phase %s/%s: %s @%s\n" "$PHASE_NUM" "$TOTAL" "$PHASE_NAME" "$AGENT"
-    printf "════════════════════════════════════════\n"
-  } >&2
+  printf "════════════════ Phase %s/%s: %s @%s ════════════════════════════════════════════════\n" "$PHASE_NUM" "$TOTAL" "$PHASE_NAME" "$AGENT" >&2
 fi
