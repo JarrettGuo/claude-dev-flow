@@ -305,6 +305,9 @@ bash .claude/hooks/error.sh "Review 被阻止，invoke debugger"
 invoke `@debugger`，回 Phase 3
 
 ### Phase 5: Commit Suggestion
+```bash
+bash .claude/hooks/phase-start.sh 5 "Commit Suggestion" "orchestrator" 6
+```
 Use `format-commit` or `commit-split` skill（按 `SUGGEST_SPLIT` 变量）。
 
 完成后进入 Phase 6：

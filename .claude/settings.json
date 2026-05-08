@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/flow-log.sh subagent-start \"$SUBAGENT_NAME\""
+            "command": "bash .claude/hooks/flow-log.sh"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/flow-log.sh subagent-stop \"$SUBAGENT_NAME\" \"$SUBAGENT_DURATION\""
+            "command": "bash .claude/hooks/flow-log.sh"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/flow-log.sh user-input \"$USER_PROMPT\""
+            "command": "bash .claude/hooks/flow-log.sh"
           }
         ]
       }

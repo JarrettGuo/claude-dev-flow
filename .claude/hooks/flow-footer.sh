@@ -34,6 +34,7 @@ fi
 rm -f .dev-flow/.phase-start
 rm -f .dev-flow/.current-phase
 rm -f .dev-flow/.current-flow
+rm -f .dev-flow/.agent-*.start .dev-flow/.jq-warned
 
 # 写 footer
 cat >> "$LOG_FILE" <<EOF

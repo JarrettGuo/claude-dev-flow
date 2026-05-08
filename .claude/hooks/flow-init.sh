@@ -56,6 +56,10 @@ fi
 
 FEATURE="${FLOW_TYPE}/${FEATURE_NAME}"
 mkdir -p ".dev-flow/${FEATURE}"
+
+# 清理上次流程残留的 agent 时间戳（防止误关联）
+rm -f .dev-flow/.agent-*.start .dev-flow/.jq-warned
+
 echo "$FEATURE" > "$CURRENT_FLOW_FILE"
 
 LOG_FILE=".dev-flow/${FEATURE}/FLOW.log"
