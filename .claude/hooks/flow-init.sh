@@ -83,9 +83,10 @@ echo "$LINE2" >> "$LOG_FILE"
   printf "[%s] ▶ PHASE Phase %s 启动\n" "$TS" "$PHASE_NUM"
 } >> "$LOG_FILE"
 
-# 启动 progress
-if source .claude/skills/progress-display/progress.bash 2>/dev/null; then
-  progress_init "$COMMAND" "$TOTAL" 2>/dev/null || true
-  date +%s > .dev-flow/.phase-start
-  progress_phase_start "$PHASE_NAME" "$PHASE_NUM" "$TOTAL" "$AGENT" 2>/dev/null || true
+# 记录 phase 起始时间（供 phase-complete 计算耗时用）
+date +%s > .dev-flow/.phase-start
+
+# 简洁终端提示
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  printf "▶ Phase %s/%s: %s @%s\n" "$PHASE_NUM" "$TOTAL" "$PHASE_NAME" "$AGENT" >&2
 fi

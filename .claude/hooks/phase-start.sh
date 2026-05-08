@@ -32,7 +32,7 @@ TS=$(date +"%H:%M:%S")
 echo "$PHASE_NUM" > ".dev-flow/.current-phase"
 date +%s > .dev-flow/.phase-start
 
-# 启动 progress
-if source .claude/skills/progress-display/progress.bash 2>/dev/null; then
-  progress_phase_start "$PHASE_NAME" "$PHASE_NUM" "$TOTAL" "$AGENT" 2>/dev/null || true
+# 简洁终端提示
+if [ "${FLOW_LOG_QUIET:-0}" != "1" ]; then
+  printf "▶ Phase %s/%s: %s @%s\n" "$PHASE_NUM" "$TOTAL" "$PHASE_NAME" "$AGENT" >&2
 fi

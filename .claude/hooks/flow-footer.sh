@@ -22,13 +22,6 @@ TS=$(date +"%H:%M:%S")
 # 计算最终 elapsed
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
 
-# 进度可视化：完成最终 phase
-if [ -n "$FINAL_PHASE" ]; then
-  if source .claude/skills/progress-display/progress.bash 2>/dev/null; then
-    progress_phase_complete "$FINAL_PHASE" "$ELAPSED" 2>/dev/null || true
-  fi
-fi
-
 # 写 COMPLETE 事件
 COMMAND_NAME=$(echo "$FEATURE" | cut -d'/' -f1 | sed 's/specs/dev/;s/fixes/fix/')
 LINE=$(printf "[%s] ✓ COMPLETE /%s 流程完成\n" "$TS" "$COMMAND_NAME")
@@ -41,7 +34,6 @@ fi
 rm -f .dev-flow/.phase-start
 rm -f .dev-flow/.current-phase
 rm -f .dev-flow/.current-flow
-rm -f .dev-flow/.progress-cmd .dev-flow/.progress-total .dev-flow/.progress-start-time .dev-flow/.progress-completed .dev-flow/.progress-elapsed
 
 # 写 footer
 cat >> "$LOG_FILE" <<EOF

@@ -22,11 +22,6 @@ shift || true
 # 计算 elapsed
 ELAPSED=$(($(date +%s) - $(cat .dev-flow/.phase-start 2>/dev/null || echo 0)))
 
-# 进度可视化：完成当前 phase
-if source .claude/skills/progress-display/progress.bash 2>/dev/null; then
-  progress_phase_complete "$CURRENT_PHASE" "$ELAPSED" 2>/dev/null || true
-fi
-
 # 如果有下一个 phase 参数，自动启动
 if [ $# -ge 4 ]; then
   NEXT_PHASE_NUM="$1"
