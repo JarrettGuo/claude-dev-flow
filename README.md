@@ -1,4 +1,3 @@
-```markdown
 # Claude Dev Flow
 
 一个基于 Claude Code 的开发流程框架，用于规范化多 agent 协作开发。
@@ -414,4 +413,3 @@ Claude 会：clone 远端 → 对比本地 `.claude/.version` → 把框架文�
 ## 许可证
 
 MIT
-```
