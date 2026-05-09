@@ -19,7 +19,7 @@ AI/Developer Tools — Claude Code 开发流程框架，规范多 agent 协作�
 |------|------|
 | `.claude/commands/` | slash command 实现（dev / fix / review / commit 等，共 9 个） |
 | `.claude/agents/` | 多 agent 协作角色定义（共 8 个） |
-| `.claude/skills/` | 可复用能力单元（共 7 个） |
+| `.claude/skills/` | 可复用能力单元（共 6 个） |
 | `.claude/docs/` | 框架规范文档 |
 | `.claude/hooks/` | Claude Code hooks（flow-log.sh） |
 | `.claude/settings.json` | Claude Code 项目级配置 |
@@ -34,49 +34,48 @@ AI/Developer Tools — Claude Code 开发流程框架，规范多 agent 协作�
 
 ```
 claude-dev-flow/
-├── .claude/               # 框架核心配置
-│   ├── agents/            # agent 定义
-│   │   ├── analyst.md     # 需求分析
-│   │   ├── architect.md   # 架构设计
-│   │   ├── bug-analyst.md # Bug 分析
-│   │   ├── debugger.md    # 调试
-│   │   ├── flow-debugger.md # Flow 复盘
-│   │   ├── implementer-be.md # 后端实现
-│   │   ├── implementer-fe.md # 前端实现
-│   │   └── reviewer.md    # 代码审查
-│   ├── commands/          # slash command 实现
-│   │   ├── dev.md         # /dev 功能开发流程
-│   │   ├── fix.md        # /fix Bug 修复流程
-│   │   ├── review.md      # /review 审查
-│   │   ├── commit.md      # /commit 提交
-│   │   ├── flow-debug.md  # /flow-debug Flow 复盘
-│   │   ├── upgrade.md      # /upgrade 升级
-│   │   ├── add-skill.md   # /add-skill 添加技能
-│   │   ├── remove-skill.md # /remove-skill 移除技能
-│   │   └── init-claude-md.md # /init-claude-md 初始化
-│   ├── docs/              # 框架规范文档
-│   │   ├── framework-rules.md # 框架规则
-│   │   ├── output-style.md    # 输出风格
-│   │   └── plugins.config.md  # 插件配置
-│   ├── hooks/             # Claude Code hooks
-│   │   └── flow-log.sh   # 自动记录 subagent 进出
-│   ├── skills/            # skill 定义
-│   │   ├── flow-log/         # 日志记录
-│   │   ├── format-commit/    # commit 格式化
-│   │   ├── progress-display/  # 进度显示
-│   │   ├── read-requirement/  # 需求读取
-│   │   ├── search-codebase/   # 代码搜索
-│   │   ├── fetch-error-context/ # 错误上下文
-│   │   └── commit-split/      # commit 拆分
-│   ├── settings.json      # Claude Code 配置
-│   ├── mcp.json          # MCP 服务器和 agent 定义
-│   └── .version          # 框架版本
-├── .dev-flow/            # /dev 和 /fix 运行记录
-│   ├── specs/            # 功能开发记录
-│   └── fixes/            # Bug 修复记录
-├── examples/              # 示例文件
-├── README.md             # 项目说明
-└── CLAUDE.md             # 本文档
+├── .claude/ # 框架核心配置
+│ ├── agents/ # agent 定义
+│ │ ├── analyst.md # 需求分析
+│ │ ├── architect.md # 架构设计
+│ │ ├── bug-analyst.md # Bug 分析
+│ │ ├── debugger.md # 调试
+│ │ ├── flow-debugger.md # Flow 复盘
+│ │ ├── implementer-be.md # 后端实现
+│ │ ├── implementer-fe.md # 前端实现
+│ │ └── reviewer.md # 代码审查
+│ ├── commands/ # slash command 实现
+│ │ ├── dev.md # /dev 功能开发流程
+│ │ ├── fix.md # /fix Bug 修复流程
+│ │ ├── review.md # /review 审查
+│ │ ├── commit.md # /commit 提交
+│ │ ├── flow-debug.md # /flow-debug Flow 复盘
+│ │ ├── upgrade.md # /upgrade 升级
+│ │ ├── add-skill.md # /add-skill 添加技能
+│ │ ├── remove-skill.md # /remove-skill 移除技能
+│ │ └── init-claude-md.md # /init-claude-md 初始化
+│ ├── docs/ # 框架规范文档
+│ │ ├── add-plugin-guide.md # 插件开发指南
+│ │ ├── framework-rules.md # 框架规则
+│ │ ├── output-style.md # 输出风格
+│ │ └── plugins.config.md # 插件配置
+│ ├── hooks/ # Claude Code hooks
+│ │ └── flow-log.sh # 自动记录 subagent 进出
+│ ├── skills/ # skill 定义
+│ │ ├── flow-log/ # 日志记录
+│ │ ├── format-commit/ # commit 格式化
+│ │ ├── read-requirement/ # 需求读取
+│ │ ├── search-codebase/ # 代码搜索
+│ │ ├── fetch-error-context/ # 错误上下文
+│ │ └── commit-split/ # commit 拆分
+│ ├── settings.json # Claude Code 配置
+│ ├── mcp.json # MCP 服务器和 agent 定义
+│ └── .version # 框架版本
+├── .dev-flow/ # /dev 和 /fix 运行记录
+│ ├── specs/ # 功能开发记录
+│ └── fixes/ # Bug 修复记录
+├── README.md # 项目说明
+└── CLAUDE.md # 本文档
 ```
 
 ## 代码规范
@@ -152,7 +151,7 @@ docs(docs): 补充 framework-rules.md 的栈外执行约束
 ### MCP 配置
 - MCP 服务器定义在 `.claude/mcp.json`（当前为空，无激活的 MCP server）
 - Agent 角色定义在 `.claude/agents/*.md`，由 Claude Code 直接加载
-- 添加新 MCP 用 `/add-skill`，不要手动修改 mcp.json
+- 添加新 MCP 用 `/add-skill`，不要手动修改 `.claude/mcp.json`
 
 ### 日志记录规范
 - 默认 `>> "$LOG"` 写文件 + 输出终端
@@ -161,7 +160,7 @@ docs(docs): 补充 framework-rules.md 的栈外执行约束
 
 ## 不要碰的模块
 - `.dev-flow/` — 历史运行记录
-- `.claude/agent-memory-local/` — agent 跨会话记忆
+- `.claude/agent-memory/` — agent 跨会话记忆
 - `.claude/settings.local.json` — 用户本地配置
 
 ## 开发环境

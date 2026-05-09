@@ -18,23 +18,22 @@ Claude Dev Flow 是一个轻量级的开发流程框架，旨在：
 
 ```
 claude-dev-flow/
-├── README.md                    # 项目说明
-├── INSTALL.md                   # 安装指南
-├── .mcp.json                    # MCP 配置
-├── examples/                    # 示例文件
-│   └── hello-world.md
-└── .claude/                     # 框架核心目录
-    ├── .version                 # 框架版本号（commit SHA）
-    ├── settings.json            # Claude Code 设置 + hooks
-    ├── hooks/                   # 自动记日志的 bash 脚本
-    ├── agents/                  # 8 个 subagent（analyst / architect / ...）
-    ├── commands/                # 9 个 slash 命令
-    ├── skills/                  # 7 个可插拔能力（flow-log / format-commit / ...）
-    └── docs/                    # 框架规范文档
-        ├── framework-rules.md   # 全局行为约束（所有 agent/command 引用）
-        ├── output-style.md      # 终端输出风格规范
-        ├── add-plugin-guide.md  # 插件开发指南
-        └── plugins.config.md    # 当前启用的插件清单
+├── README.md # 项目说明
+├── INSTALL.md # 安装指南
+└── .claude/ # 框架核心目录
+ ├── .version # 框架版本号（commit SHA）
+ ├── mcp.json # MCP 服务器配置
+ ├── settings.json # Claude Code 设置 + hooks
+ ├── hooks/ # 自动记日志的 bash 脚本
+ ├── agents/ # 8 个 subagent（analyst / architect / ...）
+ ├── commands/ # 9 个 slash 命令
+ ├── skills/ # 6 个可插拔能力（flow-log / format-commit / ...）
+ ├── agent-memory/ # agent 跨会话记忆
+ └── docs/ # 框架规范文档
+ ├── add-plugin-guide.md # 插件开发指南
+ ├── framework-rules.md # 全局行为约束（所有 agent/command 引用）
+ ├── output-style.md # 终端输出风格规范
+ └── plugins.config.md # 当前启用的插件清单
 ```
 
 ## 命令速查
@@ -176,7 +175,7 @@ Claude 会：
 
 ### `/add-skill` — 用自然语言添加能力
 
-Claude 自动改 `.mcp.json` / skill 路由表 / `plugins.config.md`，不用自己记要改哪几个文件。
+Claude 自动改 `.claude/mcp.json` / skill 路由表 / `plugins.config.md`，不用自己记要改哪几个文件。
 
 **启用已有 MCP 模板**
 ```
@@ -231,9 +230,9 @@ Claude 会展示改动计划让你确认，再执行。
 /remove-skill read-requirement 不要支持 gitlab 了
 ```
 
-**清理 .mcp.json 不一致**
+**清理 .claude/mcp.json 不一致**
 ```
-/remove-skill 帮我清理 .mcp.json 里孤立的配置
+/remove-skill 帮我清理 .claude/mcp.json 里孤立的配置
 ```
 
 Claude 会展示删除/停用计划、列出降级影响，让你确认后再动手。
@@ -310,10 +309,10 @@ Claude 会：clone 远端 → 对比本地 `.claude/.version` → 把框架文�
 
 **受保护文件**（永远不动）：
 - `CLAUDE.md` / `CLAUDE.md.bak`（你的项目上下文）
-- `.mcp.json`（你启用的 MCP）
+- `.claude/mcp.json`（你启用的 MCP）
 - `.dev-flow/`（历史运行记录）
 - `.env` / `.env.*`
-- `.claude/agent-memory-local/`（agent 跨会话记忆）
+- `.claude/agent-memory/`（agent 跨会话记忆）
 - 你自己新增的 agent / command / skill（框架仓库里没有的）
 
 **冲突策略**：框架文件你改过就**停下来问你**，绝不静默覆盖。选择覆盖时会先备份整个 `.claude/` 到 `.claude.backup-YYYYMMDD-HHMMSS/`，想找回改动随时能翻。
@@ -322,9 +321,14 @@ Claude 会：clone 远端 → 对比本地 `.claude/.version` → 把框架文�
 
 ## 典型工作流
 
-**新人第一天**：
+**新人第一天（每个项目首次使用时跑一次）**：
 ```
-/init-claude-md # 生成项目上下文
+/init-claude-md # 扫描项目生成 CLAUDE.md
+```
+
+生成后 review `CLAUDE.md` 并提交到 git（后续命令依赖它），**再**跑 `/dev` 或 `/fix`：
+
+```
 /dev 跑一个小需求验证流程 # 试水
 ```
 
